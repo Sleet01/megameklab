@@ -36,7 +36,14 @@ sourceSets {
 }
 
 ext {
-    mmlJvmOptions = ['-Xmx1024m']
+    mmlJvmOptions = [
+            '-Xmx1024m',
+            '--add-opens',
+            'java.base/java.util=ALL-UNNAMED',
+            '--add-opens',
+            'java.base/java.util.concurrent=ALL-UNNAMED',
+            '-Dsun.awt.disablegrab=true'
+    ]
     data = 'data'
     docs = 'docs'
     lib = 'lib'
