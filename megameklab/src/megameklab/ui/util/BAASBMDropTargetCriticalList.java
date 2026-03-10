@@ -86,7 +86,7 @@ public class BAASBMDropTargetCriticalList<E> extends JList<E> implements MouseLi
     /** 0-crit equipment assigned to this location, displayed as virtual slots beyond the normal crit count. */
     private final List<Mounted<?>> zeroCritMounts = new ArrayList<>();
     /** The number of normal (physical) critical slots in this location. */
-    private int normalCritCount;
+    private int normalCritCount = Integer.MAX_VALUE;
 
     public BAASBMDropTargetCriticalList(List<E> vector, EntitySource eSource,
           RefreshListener refresh, boolean buildView,

@@ -74,6 +74,10 @@ public class BAASCriticalTransferHandler extends AbstractCriticalTransferHandler
         if (data == null) {
             return;
         }
+        // only need to actively remove the dragged equipment when the source is another location
+        if (!(source instanceof BAASBMDropTargetCriticalList<?> list)) {
+            return;
+        }
         Mounted<?> mounted;
         try {
             mounted = getUnit().getEquipment(Integer.parseInt((String) data.getTransferData(DataFlavor.stringFlavor)));
@@ -82,51 +86,54 @@ public class BAASCriticalTransferHandler extends AbstractCriticalTransferHandler
             return;
         }
 
-        if ((source instanceof BAASBMDropTargetCriticalList<?> list) && (mounted.getLocation() != Entity.LOC_NONE)) {
-            int loc;
-            if (getUnit() instanceof BattleArmor) {
-                String[] split = list.getName().split(":");
-                loc = Integer.parseInt(split[0]);
-            } else {
-                loc = Integer.parseInt(list.getName());
-                if (loc == mounted.getLocation()) {
-                    return;
-                }
-            }
-            int slot = list.getSelectedIndex();
-            int startSlot = slot;
-            mounted = list.getMounted();
-            if (mounted == null) {
-                return;
-            }
-            if (UnitUtil.isFixedLocationSpreadEquipment(mounted.getType())) {
-                return;
-            }
-            while (slot > 0) {
-                slot--;
-                CriticalSlot cs = getUnit().getCritical(loc, slot);
-                if ((cs != null) && (cs.getType() == CriticalSlot.TYPE_EQUIPMENT) && cs.getMount().equals(mounted)) {
-                    startSlot = slot;
-                }
-            }
-            if (!(getUnit() instanceof BattleArmor)) {
-                for (int i = startSlot; i < (startSlot + UnitUtil.getCritsUsed(mounted)); i++) {
-                    getUnit().setCritical(loc, i, null);
-                }
-            }
-            Mounted<?> linkedBy = mounted.getLinkedBy();
-            if ((linkedBy != null) && !(getUnit() instanceof BattleArmor)) {
-                UnitUtil.removeCriticalSlots(getUnit(), linkedBy);
-                try {
-                    UnitUtil.addMounted(getUnit(), linkedBy, mounted.getLocation(), linkedBy.isRearMounted());
-                } catch (LocationFullException e) {
-                    UnitUtil.changeMountStatus(getUnit(), linkedBy, Entity.LOC_NONE, Entity.LOC_NONE, false);
-                    linkedBy.setLinked(null);
-                    mounted.setLinkedBy(null);
-                }
-            }
-            refresh.refreshBuild();
+        // only need to actively remove the dragged equipment if it was allocated
+        if (mounted.getLocation() == Entity.LOC_NONE) {
+            return;
         }
+
+        int loc;
+        if (getUnit() instanceof BattleArmor) {
+            String[] split = list.getName().split(":");
+            loc = Integer.parseInt(split[0]);
+        } else {
+            loc = Integer.parseInt(list.getName());
+            if (loc == mounted.getLocation()) {
+                return;
+            }
+        }
+        int slot = list.getSelectedIndex();
+        int startSlot = slot;
+        mounted = list.getMounted();
+        if (mounted == null) {
+            return;
+        }
+        if (UnitUtil.isFixedLocationSpreadEquipment(mounted.getType())) {
+            return;
+        }
+        while (slot > 0) {
+            slot--;
+            CriticalSlot cs = getUnit().getCritical(loc, slot);
+            if ((cs != null) && (cs.getType() == CriticalSlot.TYPE_EQUIPMENT) && cs.getMount().equals(mounted)) {
+                startSlot = slot;
+            }
+        }
+        if (!(getUnit() instanceof BattleArmor)) {
+            for (int i = startSlot; i < (startSlot + UnitUtil.getCritsUsed(mounted)); i++) {
+                getUnit().setCritical(loc, i, null);
+            }
+        }
+        Mounted<?> linkedBy = mounted.getLinkedBy();
+        if ((linkedBy != null) && !(getUnit() instanceof BattleArmor)) {
+            UnitUtil.removeCriticalSlots(getUnit(), linkedBy);
+            try {
+                UnitUtil.addMounted(getUnit(), linkedBy, mounted.getLocation(), linkedBy.isRearMounted());
+            } catch (LocationFullException e) {
+                UnitUtil.changeMountStatus(getUnit(), linkedBy, Entity.LOC_NONE, Entity.LOC_NONE, false);
+                linkedBy.setLinked(null);
+                mounted.setLinkedBy(null);
+            }
+        }
+        refresh.refreshBuild();
     }
 
     private boolean addEquipmentBA(BattleArmor ba, Mounted<?> newMount, int trooper) {
