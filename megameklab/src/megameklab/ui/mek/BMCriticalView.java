@@ -67,6 +67,7 @@ import megamek.common.units.TripodMek;
 import megameklab.ui.EntitySource;
 import megameklab.ui.util.BAASBMDropTargetCriticalList;
 import megameklab.ui.util.CritCellUtil;
+import megameklab.ui.util.CriticalSlotsView;
 import megameklab.ui.util.IView;
 import megameklab.ui.util.RefreshListener;
 import megameklab.util.MekUtil;
@@ -79,7 +80,7 @@ import megameklab.util.UnitUtil;
  * @author arlith
  * @author Simon (Juliez)
  */
-public class BMCriticalView extends IView implements ActionListener {
+public class BMCriticalView extends IView implements ActionListener, CriticalSlotsView {
 
     private static final String CASE_NONE_LABEL = "None";
 
@@ -116,7 +117,7 @@ public class BMCriticalView extends IView implements ActionListener {
           Mek.LOC_CENTER_LEG,
           clPanel);
 
-    private final List<BAASBMDropTargetCriticalList<String>> currentCritBlocks = new ArrayList<>();
+    private final List<BAASBMDropTargetCriticalList> currentCritBlocks = new ArrayList<>();
 
     /** Per-location CASE dropdown panels (label + combo) */
     private final Map<Integer, JPanel> casePanels = new HashMap<>();
@@ -280,7 +281,7 @@ public class BMCriticalView extends IView implements ActionListener {
                     }
                 }
 
-                BAASBMDropTargetCriticalList<String> criticalSlotList = getCriticalSlotList(
+                BAASBMDropTargetCriticalList criticalSlotList = getCriticalSlotList(
                       critNames,
                       location);
                 criticalSlotList.setZeroCritMounts(zeroCritMounts, normalCritCount);
@@ -302,10 +303,9 @@ public class BMCriticalView extends IView implements ActionListener {
         }
     }
 
-    private BAASBMDropTargetCriticalList<String> getCriticalSlotList(Vector<String> critNames,
-          int location) {
-        BAASBMDropTargetCriticalList<String> criticalSlotList = new BAASBMDropTargetCriticalList<>(
-              critNames, eSource, refresh, true, this);
+    private BAASBMDropTargetCriticalList getCriticalSlotList(Vector<String> critNames, int location) {
+        BAASBMDropTargetCriticalList criticalSlotList = new BAASBMDropTargetCriticalList(
+              critNames, eSource, refresh, this);
         criticalSlotList.setVisibleRowCount(critNames.size());
         criticalSlotList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         criticalSlotList.setName(location + "");
@@ -574,18 +574,14 @@ public class BMCriticalView extends IView implements ActionListener {
         }
     }
 
-    /**
-     * Darkens all crit blocks other than the one for the given location
-     */
+    @Override
     public void markUnavailableLocations(int location) {
         currentCritBlocks.stream()
               .filter(b -> b.getCritLocation() != location)
               .forEach(b -> b.setDarkened(true));
     }
 
-    /**
-     * Darkens all crit blocks that are unavailable to the given equipment, e.g. all but Torsos for CASE.
-     */
+    @Override
     public void markUnavailableLocations(@Nullable Mounted<?> equipment) {
         if (equipment != null) {
             currentCritBlocks.stream()
@@ -594,7 +590,7 @@ public class BMCriticalView extends IView implements ActionListener {
         }
     }
 
-    /** Resets all crit blocks to not darkened. */
+    @Override
     public void unMarkAllLocations() {
         currentCritBlocks.forEach(b -> b.setDarkened(false));
     }

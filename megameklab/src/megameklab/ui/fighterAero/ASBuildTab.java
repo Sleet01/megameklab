@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2008-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMekLab.
  *
@@ -33,6 +33,7 @@
 
 package megameklab.ui.fighterAero;
 
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -65,41 +66,32 @@ public class ASBuildTab extends ITab implements ActionListener {
 
     public ASBuildTab(EntitySource eSource) {
         super(eSource);
-        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new GridBagLayout());
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-
-        GridBagConstraints gbc = new GridBagConstraints();
 
         critView = new ASCriticalView(eSource, refresh);
-        buildView = new ASBuildView(eSource, refresh);
-
-        resetButton.setMnemonic('R');
+        buildView = new ASBuildView(eSource, refresh, critView);
         resetButton.setActionCommand(RESET_COMMAND);
-        buttonPanel.add(resetButton);
 
+        JPanel unallocatedEquipmentBlock = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 0;
         gbc.fill = GridBagConstraints.VERTICAL;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        mainPanel.add(buildView, gbc);
-        gbc.gridy = 1;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        unallocatedEquipmentBlock.add(buildView, gbc);
         gbc.fill = GridBagConstraints.NONE;
-        gbc.weighty = 0.0;
-        mainPanel.add(buttonPanel, gbc);
-        this.add(critView);
-        this.add(mainPanel);
+        gbc.weighty = 0;
+        unallocatedEquipmentBlock.add(resetButton, gbc);
+
+        setLayout(new BorderLayout(5, 5));
+        add(critView, BorderLayout.CENTER);
+        add(unallocatedEquipmentBlock, BorderLayout.EAST);
+
         refresh();
     }
 
     public void refresh() {
         removeAllActionListeners();
         critView.refresh();
-        critView.validate();
         buildView.refresh();
         addAllActionListeners();
     }
@@ -111,7 +103,6 @@ public class ASBuildTab extends ITab implements ActionListener {
         }
     }
 
-
     private void resetCrits() {
         for (Mounted<?> mount : getAero().getEquipment()) {
             if (!mount.isWeaponGroup() && TestAero.eqRequiresLocation(mount.getType(), true)
@@ -120,7 +111,6 @@ public class ASBuildTab extends ITab implements ActionListener {
                 UnitUtil.changeMountStatus(getAero(), mount, Entity.LOC_NONE, Entity.LOC_NONE, false);
             }
         }
-
         refresh.scheduleRefresh();
     }
 

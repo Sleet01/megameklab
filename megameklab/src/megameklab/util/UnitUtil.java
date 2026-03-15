@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2008-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMekLab.
  *
@@ -487,21 +487,20 @@ public class UnitUtil {
     }
 
     /**
-     * Sets the corresponding critical slots to null for the Mounted object.
+     * Sets the corresponding critical slots to null for the Mounted object. All crit slots of the unit are checked for
+     * any presence of that Mounted (object equality!) and emptied where found. When mounted is null, this method does
+     * nothing. Note that the crit slots are checked even if the mounted equipment is unallocated (in Entity.LOC_NONE)
+     * or not part of the unit at all.
      *
-     * @param unit The entity
-     * @param eq   The equipment to test
+     * @param unit    The entity
+     * @param mounted The equipment to test
      */
-    public static void removeCriticalSlots(Entity unit, Mounted<?> eq) {
-        if (eq.getLocation() == Entity.LOC_NONE) {
-            return;
-        }
-
+    public static void removeCriticalSlots(Entity unit, @Nullable Mounted<?> mounted) {
         for (int loc = 0; loc < unit.locations(); loc++) {
             for (int slot = 0; slot < unit.getNumberOfCriticalSlots(loc); slot++) {
                 CriticalSlot criticalSlot = unit.getCritical(loc, slot);
                 if ((criticalSlot != null) && (criticalSlot.getType() == CriticalSlot.TYPE_EQUIPMENT)) {
-                    if ((criticalSlot.getMount() != null) && (criticalSlot.getMount().equals(eq))) {
+                    if ((criticalSlot.getMount() != null) && (criticalSlot.getMount().equals(mounted))) {
                         // If there are two pieces of equipment in this slot, remove first one, and replace it with
                         // the second
                         if (criticalSlot.getMount2() != null) {
@@ -511,7 +510,7 @@ public class UnitUtil {
                             // If it's the only Mounted, clear the slot
                             unit.setCritical(loc, slot, null);
                         }
-                    } else if ((criticalSlot.getMount2() != null) && (criticalSlot.getMount2().equals(eq))) {
+                    } else if ((criticalSlot.getMount2() != null) && (criticalSlot.getMount2().equals(mounted))) {
                         criticalSlot.setMount2(null);
                     }
                 }
@@ -551,13 +550,26 @@ public class UnitUtil {
         }
     }
 
+    /**
+     * Adds the given Mounted equipment to the given unit in the given location, applying rearMounted, by forwarding to
+     * Entity.addEquipment() -- see that method for details. Also sets the equipment to pod-mounted on Omni units if
+     * possible, and updates Clan CASE placement on Meks. This method is an MML wrapper for Entity.addEquipment().
+     *
+     * @param unit        The Entity
+     * @param mounted     The equipment to add
+     * @param loc         The location for the equipment
+     * @param rearMounted When true, set the equipment to rear-facing if possible
+     *
+     * @throws LocationFullException When the location is full
+     * @see Entity#addEquipment(Mounted, int, boolean)
+     */
     public static void addMounted(Entity unit, Mounted<?> mounted, int loc, boolean rearMounted)
           throws LocationFullException {
         unit.addEquipment(mounted, loc, rearMounted);
         mounted.setOmniPodMounted(canPodMount(unit, mounted));
 
-        if (unit instanceof Mek mekUnit) {
-            MekUtil.updateClanCasePlacement(mekUnit);
+        if (unit instanceof Mek mek) {
+            MekUtil.updateClanCasePlacement(mek);
         }
     }
 
@@ -727,9 +739,14 @@ public class UnitUtil {
     }
 
     /**
-     * Changes the location for a Mounted instance. Note: for BattleArmor, this effects which suit the equipment is
-     * placed on (as that is what Mounted. Location means for BA), but not where on the suit it's located (ie,
-     * BAMountLocation isn't affected). BattleArmor should change this outside of this method.
+     * Updates the location for a Mounted equipment. If the equipment was previously in another location, links to other
+     * equipment are removed. If it is placed in a location on the unit (i.e., not Entity.LOC_NONE), new links are
+     * possibly created using MekFileParser.postLoadInit(). On Meks, Clan CASE placement is updated. This method does
+     * *NOT* change nor create Critical Slots.
+     * <p>
+     * Note: for BattleArmor, this affects which suit the equipment is placed on (as that is what Mounted. Location
+     * means for BA), but not where on the suit it's located (ie, BAMountLocation isn't affected). BattleArmor should
+     * change this outside of this method.
      *
      * @param unit              The entity The unit being modified
      * @param eq                The equipment to test The equipment mount to move
@@ -758,12 +775,11 @@ public class UnitUtil {
             try {
                 MekFileParser.postLoadInit(unit);
             } catch (Exception ignored) {
-                // Exception thrown for not having equipment to link to yet, which is acceptable
-                // here
+                // Exception thrown for not having equipment to link to yet, which is acceptable here
             }
         }
-        if (unit instanceof Mek) {
-            MekUtil.updateClanCasePlacement((Mek) unit);
+        if (unit instanceof Mek mek) {
+            MekUtil.updateClanCasePlacement(mek);
         }
     }
 
@@ -1103,6 +1119,13 @@ public class UnitUtil {
         return null;
     }
 
+    /**
+     * Removes empty crit slots between equipment from the given location on the given unit, if there are any. Does
+     * nothing for an invalid location, including Entity.LOC_NONE.
+     *
+     * @param unit The Entity
+     * @param loc  The location to compact
+     */
     public static void compactCriticalSlots(Entity unit, int loc) {
         int firstEmpty = -1;
         for (int slot = 0; slot < unit.getNumberOfCriticalSlots(loc); slot++) {
@@ -1780,18 +1803,19 @@ public class UnitUtil {
     }
 
     /**
-     * Checks whether the equipment can be added to the location on the build tab
+     * Returns true when the given equipment can be placed in the given location on the given unit. This does not test
+     * if it can be added again given other present equipment (i.e., if there are restrictions on the equipment count),
+     * only if the location is suitable for the equipment type at all.
      *
      * @param unit     The entity being designed
-     * @param eq       The equipment to test The equipment
-     * @param location The location to add it
+     * @param eq       The equipment to test
+     * @param location The location
      *
-     * @return Whether the location is valid
+     * @return True when an equipment of the given type can be placed in the given location
      */
     public static boolean isValidLocation(Entity unit, EquipmentType eq, int location) {
         if (unit instanceof BattleArmor) {
-            // Can only be mounted in APM or armored glove; can't be added directly to
-            // location
+            // Can only be mounted in APM or armored glove; can't be added directly to location
             return !(eq instanceof WeaponType && eq.hasFlag(WeaponType.F_INFANTRY));
         }
         return TestEntity.isValidLocation(unit, eq, location, null);

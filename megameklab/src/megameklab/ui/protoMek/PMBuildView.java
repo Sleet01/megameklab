@@ -113,7 +113,7 @@ public class PMBuildView extends IView implements ActionListener, MouseListener 
     }
 
     public void addRefreshedListener(RefreshListener l) {
-        cth.addRefreshListener(l);
+        cth.setRefresh(l);
     }
 
     private void loadEquipmentTable() {

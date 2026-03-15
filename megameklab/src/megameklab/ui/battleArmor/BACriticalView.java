@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2008-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMekLab.
  *
@@ -53,6 +53,7 @@ import megamek.common.weapons.infantry.InfantryWeapon;
 import megameklab.ui.EntitySource;
 import megameklab.ui.util.BAASBMDropTargetCriticalList;
 import megameklab.ui.util.CritCellUtil;
+import megameklab.ui.util.CriticalSlotsView;
 import megameklab.ui.util.IView;
 import megameklab.ui.util.RefreshListener;
 
@@ -64,7 +65,7 @@ import megameklab.ui.util.RefreshListener;
  * @author arlith
  * @author Simon (Juliez)
  */
-public class BACriticalView extends IView {
+public class BACriticalView extends IView implements CriticalSlotsView {
 
     private final Box leftArmPanel = Box.createVerticalBox();
     private final Box rightArmPanel = Box.createVerticalBox();
@@ -169,7 +170,7 @@ public class BACriticalView extends IView {
                     }
                 }
 
-                BAASBMDropTargetCriticalList<String> criticalSlotList = getCriticalSlotList(critNames, location);
+                BAASBMDropTargetCriticalList criticalSlotList = getCriticalSlotList(critNames, location);
                 switch (location) {
                     case BattleArmor.MOUNT_LOC_LEFT_ARM:
                         leftArmPanel.add(criticalSlotList);
@@ -232,10 +233,10 @@ public class BACriticalView extends IView {
         }
     }
 
-    private BAASBMDropTargetCriticalList<String> getCriticalSlotList(Vector<String> critNames,
+    private BAASBMDropTargetCriticalList getCriticalSlotList(Vector<String> critNames,
           int location) {
-        BAASBMDropTargetCriticalList<String> criticalSlotList = new BAASBMDropTargetCriticalList<>(
-              critNames, eSource, refresh, showEmpty, this);
+        BAASBMDropTargetCriticalList criticalSlotList = new BAASBMDropTargetCriticalList(
+              critNames, eSource, refresh, this);
         criticalSlotList.setVisibleRowCount(critNames.size());
         criticalSlotList.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         criticalSlotList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -249,5 +250,20 @@ public class BACriticalView extends IView {
         JLabel label = new JLabel(text);
         label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         return label;
+    }
+
+    @Override
+    public void markUnavailableLocations(int location) {
+        // not implemented yet
+    }
+
+    @Override
+    public void markUnavailableLocations(Mounted<?> equipment) {
+        // not implemented yet
+    }
+
+    @Override
+    public void unMarkAllLocations() {
+        // not implemented yet
     }
 }
