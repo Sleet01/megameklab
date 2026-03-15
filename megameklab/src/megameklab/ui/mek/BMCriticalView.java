@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2008-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMekLab.
  *
@@ -310,7 +310,6 @@ public class BMCriticalView extends IView implements ActionListener, CriticalSlo
         criticalSlotList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         criticalSlotList.setName(location + "");
         criticalSlotList.setBorder(BorderFactory.createLineBorder(CritCellUtil.CRITICAL_CELL_BORDER_COLOR));
-        criticalSlotList.setPrototypeCellValue(CritCellUtil.CRITICAL_CELL_WIDTH_STRING);
         return criticalSlotList;
     }
 
