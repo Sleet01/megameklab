@@ -241,6 +241,7 @@ public class ProtoMekMountList extends JList<Mounted<?>> {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
               boolean hasFocus) {
+
             final ProtoMekMountList lstMount = (ProtoMekMountList) list;
             final Entity entity = lstMount.eSource.getEntity();
             if ((value instanceof Mounted<?> mounted) && (mounted.getType() == widthWeaponType)) {
@@ -248,12 +249,15 @@ public class ProtoMekMountList extends JList<Mounted<?>> {
                 setText(CritCellUtil.CRITICAL_CELL_WIDTH_STRING);
                 setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.black));
             } else {
-                if (value instanceof Mounted<?> mounted) {
-                    CritCellUtil.formatCell(this, mounted, true, entity, index);
+                // a null value is an empty cell and must be allowed here:
+                if (value instanceof Mounted<?> || value == null) {
+                    CritCellUtil.formatCell(this, (Mounted<?>) value, true, entity, index);
                 }
 
                 if ((index > 0) && (index < list.getModel().getSize())) {
                     setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.black));
+                } else {
+                    setBorder(null);
                 }
             }
             return this;

@@ -40,10 +40,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import megamek.common.CriticalSlot;
-import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.Mounted;
-import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import megameklab.ui.EntitySource;
 import megameklab.ui.PopupMessages;
@@ -151,9 +149,11 @@ public class CriticalTransferHandler extends AbstractCriticalTransferHandler {
         Mounted<?> mount = null;
         if (component instanceof JTable table) {
             mount = (Mounted<?>) table.getModel().getValueAt(table.getSelectedRow(), CriticalTableModel.EQUIPMENT);
-        } else if (component instanceof ProtoMekMountList) {
-            mount = ((ProtoMekMountList) component).getMounted();
-            if (UnitUtil.isFixedLocationSpreadEquipment(mount.getType()) || (mount.getType() instanceof AmmoType)) {
+        } else if (component instanceof ProtoMekMountList protoMekMountList) {
+            mount = protoMekMountList.getMounted();
+            if (mount == null
+                  || UnitUtil.isFixedLocationSpreadEquipment(mount.getType())
+                  || mount.getType() instanceof AmmoType) {
                 return null;
             }
         }
