@@ -32,9 +32,12 @@
  */
 package megameklab.ui.util;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -73,10 +76,13 @@ public class ProtoMekMountList extends JList<Mounted<?>> {
 
     private final EntitySource eSource;
     private final int location;
+    private boolean darkened = false;
     private RefreshListener refresh;
     private static final WeaponType widthWeaponType = new WeaponType();
 
-    public ProtoMekMountList(EntitySource eSource, RefreshListener refresh, int location) {
+    public ProtoMekMountList(EntitySource eSource, RefreshListener refresh, int location,
+          CriticalSlotsView criticalSlotsView) {
+
         this.eSource = eSource;
         this.refresh = refresh;
         this.location = location;
@@ -161,7 +167,7 @@ public class ProtoMekMountList extends JList<Mounted<?>> {
         };
         addMouseListener(mouseListener);
         setDragEnabled(true);
-        setTransferHandler(new CriticalTransferHandler(eSource, refresh));
+        setTransferHandler(new CriticalTransferHandler(eSource, refresh, criticalSlotsView));
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
         WeaponMounted criticalCellWidthMounted = new WeaponMounted(eSource.getEntity(), widthWeaponType);
@@ -279,5 +285,22 @@ public class ProtoMekMountList extends JList<Mounted<?>> {
 
     private boolean isTorso() {
         return location == ProtoMek.LOC_TORSO;
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (darkened) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+            g2.setColor(Color.BLACK);
+            g2.fillRect(0, 0, getWidth(), getHeight());
+            g2.dispose();
+        }
+    }
+
+    public void setDarkened(boolean darkened) {
+        this.darkened = darkened;
+        repaint();
     }
 }

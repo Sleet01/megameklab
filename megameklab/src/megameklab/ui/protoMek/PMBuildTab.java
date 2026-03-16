@@ -82,7 +82,7 @@ public class PMBuildTab extends ITab implements ActionListener {
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 
         critView = new PMCriticalView(eSource, refresh);
-        buildView = new PMBuildView(eSource, refresh);
+        buildView = new PMBuildView(eSource, refresh, critView);
 
         mainPanel.add(buildView);
 

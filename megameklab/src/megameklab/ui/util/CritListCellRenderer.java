@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2009-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMekLab.
  *
@@ -31,10 +31,6 @@
  * affiliated with Microsoft.
  */
 
-/*
- * Thanks to Lost in space of the Solaris Sunk Works Project for the code snippet and idea.
- */
-
 package megameklab.ui.util;
 
 import static megameklab.ui.util.CritCellUtil.CRITICAL_CELL_WIDTH_STRING;
@@ -55,6 +51,9 @@ import megameklab.ui.EntitySource;
 import megameklab.util.CConfig;
 import megameklab.util.UnitUtil;
 
+/**
+ * Thanks to Lost in space of the Solaris Sunk Works Project for the code snippet and idea.
+ */
 public class CritListCellRenderer extends DefaultListCellRenderer {
 
     private JList<?> list = null;
@@ -89,7 +88,7 @@ public class CritListCellRenderer extends DefaultListCellRenderer {
             /*
              * safety against logic error where we try to redraw deleted equipment due to poor dupe slot handling
              **/
-            Mounted<?> eq = getEntitySource().getEquipment(eqId);
+            Mounted<?> eq = getUnit().getEquipment(eqId);
             cs = eq != null ? new CriticalSlot(eq) : null;
         } else if (split.length > 1) {
             cs = getCrit(Integer.parseInt(split[1]));
@@ -154,8 +153,8 @@ public class CritListCellRenderer extends DefaultListCellRenderer {
         int location = getCritLocation();
         CriticalSlot criticalSlot = null;
 
-        if ((slot >= 0) && (slot < getEntitySource().getNumberOfCriticalSlots(location))) {
-            criticalSlot = getEntitySource().getCritical(location, slot);
+        if ((slot >= 0) && (slot < getUnit().getNumberOfCriticalSlots(location))) {
+            criticalSlot = getUnit().getCritical(location, slot);
         }
 
         return criticalSlot;
@@ -170,7 +169,7 @@ public class CritListCellRenderer extends DefaultListCellRenderer {
         }
     }
 
-    private Entity getEntitySource() {
+    private Entity getUnit() {
         return entitySource.getEntity();
     }
 }
