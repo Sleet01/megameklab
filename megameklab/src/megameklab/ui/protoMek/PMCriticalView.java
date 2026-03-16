@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMekLab.
  *
@@ -43,7 +43,6 @@ import megamek.common.equipment.Mounted;
 import megamek.common.units.ProtoMek;
 import megamek.common.verifier.TestProtoMek;
 import megameklab.ui.EntitySource;
-import megameklab.ui.PopupMessages;
 import megameklab.ui.util.CritCellUtil;
 import megameklab.ui.util.CriticalSlotsView;
 import megameklab.ui.util.IView;
@@ -54,9 +53,6 @@ import megameklab.util.UnitUtil;
 
 /**
  * The Crit Slots view for a ProtoMek
- *
- * @author neoancient
- * @author Simon (Juliez)
  */
 public class PMCriticalView extends IView implements CriticalSlotsView {
 
