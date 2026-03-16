@@ -50,17 +50,11 @@ import megameklab.ui.util.RefreshListener;
 import megameklab.util.UnitUtil;
 
 public class ASBuildTab extends ITab implements ActionListener {
+
     private RefreshListener refresh = null;
     private final ASCriticalView critView;
-
-    public ASBuildView getBuildView() {
-        return buildView;
-    }
-
     private final ASBuildView buildView;
-
     private final JButton resetButton = new JButton("Reset");
-
     private final String RESET_COMMAND = "resetButtonCommand";
 
     public ASBuildTab(EntitySource eSource) {
@@ -134,4 +128,7 @@ public class ASBuildTab extends ITab implements ActionListener {
         }
     }
 
+    public ASBuildView getBuildView() {
+        return buildView;
+    }
 }

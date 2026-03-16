@@ -93,7 +93,7 @@ public class BAASBMDropTargetCriticalList extends JList<String> implements Mouse
         setDragEnabled(true);
         this.eSource = eSource;
         this.refresh = refresh;
-        setCellRenderer(new CritListCellRenderer(eSource.getEntity(), true));
+        setCellRenderer(new CritListCellRenderer(eSource, true));
         addMouseListener(this);
         if (eSource.getEntity() instanceof Mek) {
             transferHandler = new BMCriticalTransferHandler(eSource, refresh, parentView);
@@ -133,14 +133,10 @@ public class BAASBMDropTargetCriticalList extends JList<String> implements Mouse
     }
 
     private void changeMountStatus(Mounted<?> eq, int location, boolean rear) {
-        changeMountStatus(eq, location, -1, rear);
-    }
-
-    private void changeMountStatus(Mounted<?> eq, int location, int secondaryLocation, boolean rear) {
         if (getUnit() instanceof BattleArmor) {
             eq.setBaMountLoc(location);
         } else {
-            UnitUtil.changeMountStatus(getUnit(), eq, location, secondaryLocation, rear);
+            UnitUtil.changeMountStatus(getUnit(), eq, location, -1, rear);
         }
 
         if (refresh != null) {
@@ -705,23 +701,14 @@ public class BAASBMDropTargetCriticalList extends JList<String> implements Mouse
      * @return true if armoring is allowed, false otherwise
      */
     private boolean canAddArmoringToCriticalSlot(CriticalSlot cs) {
-        if (!(getUnit() instanceof Mek mek)) {
-            return false;
-        }
-
-        // Superheavy meks cannot have any armored components
-        if (mek.isSuperHeavy()) {
+        if (!(getUnit() instanceof Mek mek) || mek.isSuperHeavy()) {
             return false;
         }
 
         // Interface Cockpit slots cannot be armored
-        if (mek.getCockpitType() == Mek.COCKPIT_INTERFACE
-              && cs.getType() == CriticalSlot.TYPE_SYSTEM
-              && cs.getIndex() == Mek.SYSTEM_COCKPIT) {
-            return false;
-        }
-
-        return true;
+        return mek.getCockpitType() != Mek.COCKPIT_INTERFACE
+              || cs.getType() != CriticalSlot.TYPE_SYSTEM
+              || cs.getIndex() != Mek.SYSTEM_COCKPIT;
     }
 
     private void changeArmoring() {

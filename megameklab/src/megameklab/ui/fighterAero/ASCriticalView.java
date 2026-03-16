@@ -245,8 +245,8 @@ public class ASCriticalView extends IView implements CriticalSlotsView {
 
     private boolean isSpaceRestricted(int location, Mounted<?> equipment) {
         return location != Aero.LOC_FUSELAGE
-              && TestAero.freeWeaponSlots(getAero(), location) <= 0
-              && TestAero.usesWeaponSlot(getAero(), equipment.getType());
+              && TestAero.usesWeaponSlot(getAero(), equipment.getType())
+              && !TestAero.hasFreeWeaponSlot(getAero(),location);
     }
 
     @Override

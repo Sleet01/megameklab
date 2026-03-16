@@ -115,24 +115,6 @@ public class CriticalTransferHandler extends AbstractCriticalTransferHandler {
             return true;
         } else if ((info.getComponent() instanceof JTable)
               || (info.getComponent() instanceof JScrollPane)) {
-//            try {
-//                Transferable t = info.getTransferable();
-//                Mounted<?> mount = getUnit().getEquipment(Integer.parseInt((String) t
-//                      .getTransferData(DataFlavor.stringFlavor)));
-//
-//                if (getUnit() instanceof BattleArmor) {
-//                    mount.setBaMountLoc(BattleArmor.MOUNT_LOC_NONE);
-//                } else {
-//                    UnitUtil.removeCriticalSlots(getUnit(), mount);
-//                    if (getUnit().isFighter() && mount.getLocation() != Entity.LOC_NONE) {
-//                        UnitUtil.compactCriticalSlots(getUnit(), mount.getLocation());
-//                    }
-//                    changeMountStatus(mount, Entity.LOC_NONE);
-//                }
-//            } catch (Exception ex) {
-//                logger.error("", ex);
-//            }
-//            return true;
             return doImport(getMountedFromTransferable(info.getTransferable()), info.getComponent());
         }
         return false;

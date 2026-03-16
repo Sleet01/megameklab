@@ -51,17 +51,18 @@ import megamek.common.CriticalSlot;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.Mounted;
 import megamek.common.units.Entity;
+import megameklab.ui.EntitySource;
 import megameklab.util.CConfig;
 import megameklab.util.UnitUtil;
 
 public class CritListCellRenderer extends DefaultListCellRenderer {
 
     private JList<?> list = null;
-    private final Entity unit;
+    private final EntitySource entitySource;
     private final boolean useColor;
 
-    public CritListCellRenderer(Entity unit, boolean useColor) {
-        this.unit = unit;
+    public CritListCellRenderer(EntitySource entitySource, boolean useColor) {
+        this.entitySource = entitySource;
         this.useColor = useColor;
     }
 
@@ -88,7 +89,7 @@ public class CritListCellRenderer extends DefaultListCellRenderer {
             /*
              * safety against logic error where we try to redraw deleted equipment due to poor dupe slot handling
              **/
-            Mounted<?> eq = unit.getEquipment(eqId);
+            Mounted<?> eq = getEntitySource().getEquipment(eqId);
             cs = eq != null ? new CriticalSlot(eq) : null;
         } else if (split.length > 1) {
             cs = getCrit(Integer.parseInt(split[1]));
@@ -107,13 +108,13 @@ public class CritListCellRenderer extends DefaultListCellRenderer {
                 }
                 setText(" " + getText());
             } else if (cs.getMount() != null) {
-                CritCellUtil.formatCell(this, cs.getMount(), useColor, unit, index);
+                CritCellUtil.formatCell(this, cs.getMount(), useColor, entitySource.getEntity(), index);
                 if (cs.getMount2() != null) {
-                    setText(getText() + " | " + UnitUtil.getCritName(unit, cs.getMount2().getType()));
+                    setText(getText() + " | " + UnitUtil.getCritName(entitySource.getEntity(), cs.getMount2().getType()));
                 }
             }
         } else {
-            CritCellUtil.formatCell(this, null, useColor, unit, index);
+            CritCellUtil.formatCell(this, null, useColor, entitySource.getEntity(), index);
         }
 
         int loc = getCritLocation();
@@ -129,12 +130,12 @@ public class CritListCellRenderer extends DefaultListCellRenderer {
             int topPad = isFirstVirtual ? CritCellUtil.ZERO_CRIT_SEPARATOR_HEIGHT : 0;
             setBorder(BorderFactory.createMatteBorder(topPad, 0, 0, 0, CritCellUtil.CRITICAL_CELL_BORDER_COLOR));
         } else if ((cs != null) &&
-              UnitUtil.isLastCrit(unit, cs, index, loc) &&
-              UnitUtil.isPreviousCriticalSlotEmpty(unit, index, loc)) {
+              UnitUtil.isLastCrit(entitySource.getEntity(), cs, index, loc) &&
+              UnitUtil.isPreviousCriticalSlotEmpty(entitySource.getEntity(), index, loc)) {
             setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, CritCellUtil.CRITICAL_CELL_BORDER_COLOR));
-        } else if ((cs != null) && UnitUtil.isLastCrit(unit, cs, index, loc)) {
+        } else if ((cs != null) && UnitUtil.isLastCrit(entitySource.getEntity(), cs, index, loc)) {
             setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, CritCellUtil.CRITICAL_CELL_BORDER_COLOR));
-        } else if ((cs != null) && UnitUtil.isPreviousCriticalSlotEmpty(unit, index, loc)) {
+        } else if ((cs != null) && UnitUtil.isPreviousCriticalSlotEmpty(entitySource.getEntity(), index, loc)) {
             setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, CritCellUtil.CRITICAL_CELL_BORDER_COLOR));
         } else {
             setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -153,15 +154,15 @@ public class CritListCellRenderer extends DefaultListCellRenderer {
         int location = getCritLocation();
         CriticalSlot criticalSlot = null;
 
-        if ((slot >= 0) && (slot < unit.getNumberOfCriticalSlots(location))) {
-            criticalSlot = unit.getCritical(location, slot);
+        if ((slot >= 0) && (slot < getEntitySource().getNumberOfCriticalSlots(location))) {
+            criticalSlot = getEntitySource().getCritical(location, slot);
         }
 
         return criticalSlot;
     }
 
     private int getCritLocation() {
-        if (unit instanceof BattleArmor) {
+        if (entitySource instanceof BattleArmor) {
             String[] split = list.getName().split(":");
             return Integer.parseInt(split[0]);
         } else {
@@ -169,4 +170,7 @@ public class CritListCellRenderer extends DefaultListCellRenderer {
         }
     }
 
+    private Entity getEntitySource() {
+        return entitySource.getEntity();
+    }
 }
