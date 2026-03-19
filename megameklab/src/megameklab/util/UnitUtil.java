@@ -420,9 +420,9 @@ public class UnitUtil {
     }
 
     /**
-     * Removes all criticalSlots of the given unit.
+     * Removes all critical slots of the given unit, unallocating all equipment (i.e., placing it into Entity.LOC_NONE).
      */
-    synchronized public static void removeAllCriticalSlots(Entity unit) {
+    public static void removeAllCriticalSlots(Entity unit) {
         removeAllCriticalSlotsFrom(unit, IntStream.range(0, unit.locations()).boxed().toList());
 
         // cleanup of remnants if any (should not be needed, but we never know)
@@ -438,21 +438,24 @@ public class UnitUtil {
     }
 
     /**
-     * Removes all criticalSlots from the given locations for the given unit.
+     * Removes all critical slots from the given locations for the given unit, unallocating all equipment in those
+     * locations (i.e., placing it into Entity.LOC_NONE).
      */
-    synchronized public static void removeAllCriticalSlotsFrom(Entity unit, List<Integer> locations) {
-        // Special handling for BattleArmor
-        if (unit instanceof BattleArmor ba) {
-            ba.getEquipment()
-                  .stream()
-                  .filter(m -> (m != null) && (m.getBaMountLoc() != BattleArmor.MOUNT_LOC_NONE))
-                  .filter(m -> locations.contains(m.getBaMountLoc()))
-                  .forEach(m -> {
-                      m.setBaMountLoc(BattleArmor.MOUNT_LOC_NONE);
-                      UnitUtil.changeMountStatus(unit, m, BattleArmor.LOC_SQUAD, BattleArmor.LOC_SQUAD, false);
-                  });
+    public static void removeAllCriticalSlotsFrom(Entity unit, List<Integer> locations) {
+        if (unit instanceof BattleArmor battleArmor) {
+            BattleArmorUtil.removeAllCriticalSlotsFrom(battleArmor, locations);
             return;
         }
+
+        // weapon bays can never be outside of their location, so delete them
+        List<Mounted<?>> weaponBays =
+              unit.getEquipment().stream()
+                    .filter(m -> m.getType() instanceof BayWeapon)
+                    .filter(m -> locations.contains(m.getLocation()))
+                    .toList();
+        // removeMounted modifies the equipment list, therefore need to create a separate weaponBay list!
+        weaponBays.forEach(mounted -> UnitUtil.removeMounted(unit, mounted));
+
         // first we remove all criticalSlots
         for (int loc = 0; loc < unit.locations(); loc++) {
             if (!locations.contains(loc)) {
@@ -474,6 +477,7 @@ public class UnitUtil {
                 }
             }
         }
+
         // cleanup of remnants if any (should not be needed, but we never know)
         unit.getEquipment()
               .stream()
