@@ -46,6 +46,7 @@ import megamek.common.weapons.attacks.SwarmAttack;
 import megamek.common.weapons.infantry.InfantryWeapon;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 public final class BattleArmorUtil {
 
@@ -137,6 +138,13 @@ public final class BattleArmorUtil {
         return (equip instanceof WeaponType)
               && (equip.hasFlag(WeaponType.F_TASER) || (((WeaponType) equip).getAmmoType()
               == AmmoType.AmmoTypeEnum.NARC));
+    }
+
+    /**
+     * Removes all critical slots for the given BA, unallocating all equipment (i.e., placing it into Entity.LOC_NONE).
+     */
+    public static void removeAllCriticalSlotsFrom(BattleArmor battleArmor) {
+        removeAllCriticalSlotsFrom(battleArmor, IntStream.range(0, battleArmor.locations()).boxed().toList());
     }
 
     /**
