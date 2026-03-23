@@ -419,10 +419,10 @@ public class UnitUtil {
     }
 
     /**
-     * Removes all critical slots of the given unit, unallocating most equipment (i.e., placing it into Entity
-     * .LOC_NONE). Generally, equipment that does not make sense when unallocated is either deleted or left in its
-     * location. Depending on unit type, ammo is left in place when its placement is not free (fighters). Unallocated
-     * Clan CASE is removed (but all other forms of CASE/CASE II/CASE-P are not). Weapon bays are deleted.
+     * Removes all critical slots of the given unit, unallocating most equipment (i.e., placing it into
+     * {@code Entity.LOC_NONE}. Generally, equipment that does not make sense when unallocated is either deleted or left
+     * in its location. Depending on unit type, ammo is left in place when its placement is not free (fighters).
+     * Unallocated Clan CASE is removed (but all other forms of CASE/CASE II/CASE-P are not). Weapon bays are deleted.
      */
     public static void removeAllCriticalSlots(Entity unit) {
         if (unit instanceof AeroSpaceFighter fighter) {

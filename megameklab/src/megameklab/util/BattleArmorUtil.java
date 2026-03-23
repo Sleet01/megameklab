@@ -141,7 +141,8 @@ public final class BattleArmorUtil {
     }
 
     /**
-     * Removes all critical slots for the given BA, unallocating all equipment (i.e., placing it into Entity.LOC_NONE).
+     * Removes all critical slots for the given BA, unallocating all equipment (i.e., placing it into
+     * BattleArmor.MOUNT_LOC_NONE and BattleArmor.LOC_SQUAD).
      */
     public static void removeAllCriticalSlotsFrom(BattleArmor battleArmor) {
         removeAllCriticalSlotsFrom(battleArmor, IntStream.range(0, battleArmor.locations()).boxed().toList());
@@ -149,7 +150,7 @@ public final class BattleArmorUtil {
 
     /**
      * Removes all critical slots from the given locations for the given BA, unallocating all equipment in those
-     * locations (i.e., placing it into Entity.LOC_NONE).
+     * locations (i.e., placing it into BattleArmor.MOUNT_LOC_NONE and BattleArmor.LOC_SQUAD).
      */
     public static void removeAllCriticalSlotsFrom(BattleArmor battleArmor, List<Integer> locations) {
         battleArmor.getEquipment()
