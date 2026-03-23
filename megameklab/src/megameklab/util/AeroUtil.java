@@ -367,5 +367,20 @@ public final class AeroUtil {
         }
     }
 
+    /**
+     * Removes all critical slots for the given fighter, unallocating all equipment (i.e., placing it into
+     * Entity.LOC_NONE) with the exception of certain equipment that has a fixed location such as Ammo.
+     */
+    public static void removeAllCriticalSlotsFromFighter(AeroSpaceFighter aero) {
+        for (Mounted<?> mount : aero.getEquipment()) {
+            if (!mount.isWeaponGroup()
+                  && TestAero.eqRequiresLocation(mount.getType(), true)
+                  && !UnitUtil.isFixedLocationSpreadEquipment(mount.getType())) {
+                UnitUtil.removeCriticalSlots(aero, mount);
+                UnitUtil.changeMountStatus(aero, mount, Entity.LOC_NONE, Entity.LOC_NONE, false);
+            }
+        }
+    }
+
     private AeroUtil() {}
 }

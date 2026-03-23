@@ -41,9 +41,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import megamek.common.equipment.Mounted;
-import megamek.common.units.Entity;
-import megamek.common.verifier.TestAero;
 import megameklab.ui.EntitySource;
 import megameklab.ui.util.ITab;
 import megameklab.ui.util.RefreshListener;
@@ -97,16 +94,9 @@ public class ASBuildTab extends ITab implements ActionListener {
     }
 
     private void resetCrits() {
-        for (Mounted<?> mount : getAero().getEquipment()) {
-            if (!mount.isWeaponGroup() && TestAero.eqRequiresLocation(mount.getType(), true)
-                  && !UnitUtil.isFixedLocationSpreadEquipment(mount.getType())) {
-                UnitUtil.removeCriticalSlots(getAero(), mount);
-                UnitUtil.changeMountStatus(getAero(), mount, Entity.LOC_NONE, Entity.LOC_NONE, false);
-            }
-        }
+        UnitUtil.removeAllCriticalSlots(getAero());
         refresh.scheduleRefresh();
     }
-
 
     public void removeAllActionListeners() {
         resetButton.removeActionListener(this);
