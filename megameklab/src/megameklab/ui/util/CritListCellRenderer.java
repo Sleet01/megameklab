@@ -161,7 +161,7 @@ public class CritListCellRenderer extends DefaultListCellRenderer {
     }
 
     private int getCritLocation() {
-        if (entitySource instanceof BattleArmor) {
+        if (entitySource.getEntity() instanceof BattleArmor) {
             String[] split = list.getName().split(":");
             return Integer.parseInt(split[0]);
         } else {

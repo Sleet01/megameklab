@@ -156,10 +156,14 @@ public class AbstractCriticalTransferHandler extends TransferHandler {
      * @return True when dragging is allowed, false otherwise
      */
     protected boolean isDraggable(@Nullable Mounted<?> mounted) {
-        return !UnitUtil.isFixedLocationSpreadEquipment(mounted.getType());
+        return (mounted != null) && !UnitUtil.isFixedLocationSpreadEquipment(mounted.getType());
     }
 
     protected boolean doImport(Mounted<?> mounted, Component target) {
+        if (mounted == null) {
+            return false;
+        }
+
         if (getUnit() instanceof AeroSpaceFighter fighter) {
             return importFighter(fighter, mounted, target);
         } else if (getUnit() instanceof BattleArmor battleArmor) {

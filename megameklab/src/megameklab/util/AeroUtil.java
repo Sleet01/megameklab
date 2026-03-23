@@ -344,7 +344,9 @@ public final class AeroUtil {
         try {
             // clean up slots of a previous location, if any
             UnitUtil.removeCriticalSlots(aero, mounted);
-            UnitUtil.compactCriticalSlots(aero, mounted.getLocation());
+            if (mounted.getLocation() != Entity.LOC_NONE) {
+                UnitUtil.compactCriticalSlots(aero, mounted.getLocation());
+            }
             // even if the mounted is already part of the unit, crit slots need to be created
             UnitUtil.addMounted(aero, mounted, location, false);
             // update links
