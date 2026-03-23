@@ -36,6 +36,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
@@ -44,8 +45,11 @@ import megamek.common.weapons.attacks.LegAttack;
 import megamek.common.weapons.attacks.StopSwarmAttack;
 import megamek.common.weapons.attacks.SwarmAttack;
 import megamek.common.weapons.infantry.InfantryWeapon;
+import megamek.logging.MMLogger;
 
 public final class BattleArmorUtil {
+
+    private static final MMLogger LOGGER = MMLogger.create(BattleArmorUtil.class);
 
     /**
      * @param eq A {@link WeaponType} or {@link MiscType}
@@ -135,6 +139,104 @@ public final class BattleArmorUtil {
         return (equip instanceof WeaponType)
               && (equip.hasFlag(WeaponType.F_TASER) || (((WeaponType) equip).getAmmoType()
               == AmmoType.AmmoTypeEnum.NARC));
+    }
+
+    /**
+     * Mounts the given weapon on the given Detachable Weapon Pack. Any previously mounted weapon is removed from it,
+     * becoming unallocated. Does nothing and logs a warning when the given dwp Mounted is not a DWP or the given weapon
+     * may not be mounted on a DWP.
+     *
+     * @param weapon The weapon to mount on the DWP
+     * @param dwp    The DWP to receive the weapon
+     */
+    public static void mountOnDwp(Mounted<?> weapon, Mounted<?> dwp) {
+        if (!dwp.is(EquipmentTypeLookup.BA_DWP)) {
+            LOGGER.warn("Trying to DWP-mount on a misc that is not a DWP!");
+            return;
+        }
+        if (!weapon.getType().canBeMountedOnBaDwp()) {
+            LOGGER.warn("Trying to DWP-mount invalid equipment!");
+            return;
+        }
+        removeMountFromDwp(dwp);
+        weapon.setLinkedBy(dwp);
+        dwp.setLinked(weapon);
+        weapon.setDWPMounted(true);
+        weapon.setBaMountLoc(BattleArmor.MOUNT_LOC_NONE);
+    }
+
+    /**
+     * Empties the given Detachable Weapon Pack, removing any weapon mounted on it. Can be safely called (does nothing)
+     * when there is no weapon on the DWP or the given Mounted is not a DWP (in this case, logs a warning).
+     *
+     * @param dwp The DWP to empty
+     */
+    public static void removeMountFromDwp(Mounted<?> dwp) {
+        if (!dwp.is(EquipmentTypeLookup.BA_DWP)) {
+            LOGGER.warn("Trying to DWP-mount on a misc that is not a DWP!");
+            return;
+        }
+        if (dwp.getLinked() != null) {
+            Mounted<?> weapon = dwp.getLinked();
+            weapon.setLinkedBy(null);
+            weapon.setDWPMounted(false);
+            dwp.setLinked(null);
+        }
+    }
+
+    /**
+     * Empties the given APM or DWP, removing any weapon or other equipment attached to it. Can be safely called (does
+     * nothing) when there is no equipment on the given mount or the given mount is neither an APM nor DWP (in this
+     * case, logs a warning).
+     *
+     * @param mount The APM/DWP to empty
+     */
+    public static void emptyDwpApm(Mounted<?> mount) {
+        if (!mount.is(EquipmentTypeLookup.BA_DWP) && !mount.is(EquipmentTypeLookup.BA_APM)) {
+            LOGGER.warn("Trying to unattach equipment from something that is neither APM nor DWP!");
+            return;
+        }
+        if (mount.getLinked() != null) {
+            Mounted<?> attachedEquipment = mount.getLinked();
+            attachedEquipment.setLinkedBy(null);
+            attachedEquipment.setDWPMounted(false);
+            attachedEquipment.setAPMMounted(false);
+            mount.setLinked(null);
+        }
+    }
+
+    /**
+     * Unallocates (removes from arm/body etc to the unallocated equipment list) the given mounted. For special mounts
+     * for other equipment (DWP etc), that other equipment is removed from this mount first, emptying the given
+     * mounted.
+     *
+     * @param mounted The equipment to unallocate
+     */
+    public static void unallocateMounted(BattleArmor battleArmor, Mounted<?> mounted) {
+        if (isFilledDwp(mounted) || isFilledApm(mounted)) {
+            emptyDwpApm(mounted);
+        }
+        if ((mounted.isAPMMounted() || mounted.isDWPMounted()) && mounted.getLinkedBy() != null) {
+            emptyDwpApm(mounted.getLinkedBy());
+        }
+        mounted.setDWPMounted(false);
+        mounted.setAPMMounted(false);
+        mounted.setBaMountLoc(BattleArmor.MOUNT_LOC_NONE);
+        UnitUtil.changeMountStatus(battleArmor, mounted, BattleArmor.LOC_SQUAD, BattleArmor.LOC_SQUAD, false);
+    }
+
+    /**
+     * @return True when the given mounted is a Detachable Weapon Pack and it has a weapon allocated to it.
+     */
+    public static boolean isFilledDwp(Mounted<?> mounted) {
+        return mounted.is(EquipmentTypeLookup.BA_DWP) && mounted.getLinked() != null;
+    }
+
+    /**
+     * @return True when the given mounted is an Anti-Personnel weapon mount and it has a weapon allocated to it.
+     */
+    public static boolean isFilledApm(Mounted<?> mounted) {
+        return mounted.is(EquipmentTypeLookup.BA_APM) && mounted.getLinked() != null;
     }
 
     private BattleArmorUtil() {

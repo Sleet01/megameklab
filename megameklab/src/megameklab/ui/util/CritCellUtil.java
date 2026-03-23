@@ -48,6 +48,7 @@ import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
 import megamek.common.units.Entity;
 import megameklab.ui.EquipmentToolTip;
+import megameklab.util.BattleArmorUtil;
 import megameklab.util.CConfig;
 import megameklab.util.UnitUtil;
 
@@ -111,7 +112,8 @@ public final class CritCellUtil {
             } else if (!mounted.getType().isHittable()) {
                 cell.setBackground(CConfig.getBackgroundColor(CConfig.GUI_COLOR_NON_HITTABLE));
                 cell.setForeground(CConfig.getForegroundColor(CConfig.GUI_COLOR_NON_HITTABLE));
-            } else if (mounted.getType() instanceof WeaponType) {
+            } else if (mounted.getType() instanceof WeaponType || BattleArmorUtil.isFilledDwp(mounted)) {
+                // while misc themselves, DWP can only mount weapons and are, for GUI, effectively weapons
                 cell.setBackground(CConfig.getBackgroundColor(CConfig.GUI_COLOR_WEAPONS));
                 cell.setForeground(CConfig.getForegroundColor(CConfig.GUI_COLOR_WEAPONS));
             } else if (mounted.getType() instanceof AmmoType) {
@@ -145,10 +147,10 @@ public final class CritCellUtil {
                     cell.setFont(cell.getFont().deriveFont(Font.ITALIC));
                 }
             }
-            if (mounted instanceof MiscMounted
-                  && (mounted.getType().hasFlag(MiscType.F_DETACHABLE_WEAPON_PACK) || mounted.getType()
-                  .hasFlag(MiscType.F_AP_MOUNT))
-                  && mounted.getLinked() != null) {
+            if (mounted.is(EquipmentTypeLookup.BA_DWP) && mounted.getLinked() != null) {
+                name = "[DWP] " + mounted.getLinked().getName();
+            }
+            if (mounted.getType().hasFlag(MiscType.F_AP_MOUNT) && mounted.getLinked() != null) {
                 name += " (attached " + mounted.getLinked().getName() + ")";
             }
 

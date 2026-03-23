@@ -51,6 +51,7 @@ import megamek.logging.MMLogger;
 import megameklab.ui.EntitySource;
 import megameklab.ui.PopupMessages;
 import megameklab.ui.mek.BMCriticalView;
+import megameklab.util.BattleArmorUtil;
 import megameklab.util.ProtoMekUtil;
 import megameklab.util.UnitUtil;
 
@@ -131,8 +132,8 @@ public class CriticalTransferHandler extends TransferHandler {
                 Mounted<?> mount = getUnit().getEquipment(Integer.parseInt((String) t
                       .getTransferData(DataFlavor.stringFlavor)));
 
-                if (getUnit() instanceof BattleArmor) {
-                    mount.setBaMountLoc(BattleArmor.MOUNT_LOC_NONE);
+                if (getUnit() instanceof BattleArmor battleArmor) {
+                    BattleArmorUtil.unallocateMounted(battleArmor, mount);
                 } else {
                     UnitUtil.removeCriticalSlots(getUnit(), mount);
                     if (getUnit().isFighter() && mount.getLocation() != Entity.LOC_NONE) {
