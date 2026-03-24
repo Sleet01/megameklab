@@ -36,8 +36,9 @@ import megamek.common.interfaces.ITechManager;
 import megamek.common.units.Entity;
 
 /**
- * In order to track when changes are made to the unit, we will have one ultimate holder of the Entity instance, and
- * pass that around. That way, when the Entity is accessed, we can set a dirty flag so we know changes were made.
+ * The EntitySource provides access to the unit, i.e. the current Entity instance, that is being edited. It is important
+ * not to store the specific Entity instance as certain changes (e.g. changing between ASF and CF or between normal BM
+ * and superheavy) require creating a new Entity subclass object and discarding the previous.
  *
  * @author nwalczak
  */

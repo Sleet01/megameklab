@@ -47,6 +47,9 @@ import megamek.common.weapons.attacks.SwarmAttack;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import megamek.logging.MMLogger;
 
+import java.util.List;
+import java.util.stream.IntStream;
+
 public final class BattleArmorUtil {
 
     private static final MMLogger LOGGER = MMLogger.create(BattleArmorUtil.class);
@@ -237,6 +240,30 @@ public final class BattleArmorUtil {
      */
     public static boolean isFilledApm(Mounted<?> mounted) {
         return mounted.is(EquipmentTypeLookup.BA_APM) && mounted.getLinked() != null;
+    }
+
+    /**
+     * Removes all critical slots for the given BA, unallocating all equipment (i.e., placing it into
+     * BattleArmor.MOUNT_LOC_NONE and BattleArmor.LOC_SQUAD).
+     */
+    public static void removeAllCriticalSlotsFrom(BattleArmor battleArmor) {
+        removeAllCriticalSlotsFrom(battleArmor, IntStream.range(0, battleArmor.locations()).boxed().toList());
+    }
+
+    /**
+     * Removes all critical slots from the given locations for the given BA, unallocating all equipment in those
+     * locations (i.e., placing it into BattleArmor.MOUNT_LOC_NONE and BattleArmor.LOC_SQUAD).
+     */
+    public static void removeAllCriticalSlotsFrom(BattleArmor battleArmor, List<Integer> locations) {
+        battleArmor.getEquipment()
+              .stream()
+              .filter(m -> (m != null) && (m.getBaMountLoc() != BattleArmor.MOUNT_LOC_NONE))
+              .filter(m -> !UnitUtil.isFixedLocationSpreadEquipment(m.getType()))
+              .filter(m -> locations.contains(m.getBaMountLoc()))
+              .forEach(m -> {
+                  m.setBaMountLoc(BattleArmor.MOUNT_LOC_NONE);
+                  UnitUtil.changeMountStatus(battleArmor, m, BattleArmor.LOC_SQUAD, BattleArmor.LOC_SQUAD, false);
+              });
     }
 
     private BattleArmorUtil() {

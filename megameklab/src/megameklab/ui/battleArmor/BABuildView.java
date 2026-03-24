@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2008-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMekLab.
  *
@@ -84,6 +84,7 @@ public class BABuildView extends IView implements ActionListener, MouseListener 
     private static final MMLogger logger = MMLogger.create(BABuildView.class);
 
     private final CriticalTableModel equipmentList;
+    private final CriticalTransferHandler transferHandler;
 
     public List<Mounted<?>> getEquipment() {
         return equipmentList.getCrits();
@@ -102,8 +103,8 @@ public class BABuildView extends IView implements ActionListener, MouseListener 
 
         equipmentTable.setModel(equipmentList);
         equipmentTable.setDragEnabled(true);
-        CriticalTransferHandler cth = new CriticalTransferHandler(eSource, null);
-        equipmentTable.setTransferHandler(cth);
+        transferHandler = new CriticalTransferHandler(eSource, null);
+        equipmentTable.setTransferHandler(transferHandler);
 
         equipmentList.initColumnSizes(equipmentTable);
         TableColumn column;
@@ -121,7 +122,7 @@ public class BABuildView extends IView implements ActionListener, MouseListener 
         equipmentScroll.setViewportView(equipmentTable);
         equipmentScroll.setMinimumSize(new Dimension(450, 450));
         equipmentScroll.setPreferredSize(new Dimension(450, 450));
-        equipmentScroll.setTransferHandler(cth);
+        equipmentScroll.setTransferHandler(transferHandler);
 
         mainPanel.add(equipmentScroll);
         equipmentTable.addMouseListener(this);
@@ -133,6 +134,7 @@ public class BABuildView extends IView implements ActionListener, MouseListener 
     }
 
     public void addRefreshedListener(RefreshListener l) {
+        transferHandler.setRefresh(l);
     }
 
     private void loadEquipmentTable() {
