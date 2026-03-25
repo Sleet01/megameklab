@@ -236,7 +236,9 @@ public final class BattleArmorUtil {
     /**
      * Unallocates (removes from arm/body etc to the unallocated equipment list) the given mounted. For special mounts
      * for other equipment (DWP etc), that other equipment is removed from this mount first, emptying the given
-     * mounted.
+     * mounted. This method will unallocate regardless of the type of equipment, i.e., it does not check if this
+     * equipment should ever go unallocated (e.g. fixed location equipment). It is therefore up to the caller to
+     * select equipment to unallocate.
      *
      * @param mounted The equipment to unallocate
      */
@@ -277,7 +279,8 @@ public final class BattleArmorUtil {
 
     /**
      * Removes all critical slots from the given locations for the given BA, unallocating all equipment in those
-     * locations (i.e., placing it into BattleArmor.MOUNT_LOC_NONE and BattleArmor.LOC_SQUAD).
+     * locations (i.e., placing it into BattleArmor.MOUNT_LOC_NONE and BattleArmor.LOC_SQUAD). Fixed location
+     * equipment is not affected (it is left in place).
      */
     public static void removeAllCriticalSlotsFrom(BattleArmor battleArmor, List<Integer> locations) {
         battleArmor.getEquipment()

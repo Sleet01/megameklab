@@ -72,7 +72,6 @@ import megamek.common.weapons.ppc.PPCWeapon;
 import megamek.logging.MMLogger;
 import megameklab.ui.EntitySource;
 import megameklab.ui.mek.BMCriticalTransferHandler;
-import megameklab.ui.mek.BMCriticalView;
 import megameklab.util.BattleArmorUtil;
 import megameklab.util.MekUtil;
 import megameklab.util.UnitUtil;

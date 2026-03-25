@@ -45,8 +45,6 @@ import megamek.common.equipment.Mounted;
 import megamek.logging.MMLogger;
 import megameklab.ui.EntitySource;
 import megameklab.ui.PopupMessages;
-import megameklab.ui.mek.BMCriticalView;
-import megameklab.util.BattleArmorUtil;
 import megameklab.util.ProtoMekUtil;
 import megameklab.util.UnitUtil;
 
