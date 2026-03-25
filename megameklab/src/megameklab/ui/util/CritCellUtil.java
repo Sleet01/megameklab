@@ -112,8 +112,10 @@ public final class CritCellUtil {
             } else if (!mounted.getType().isHittable()) {
                 cell.setBackground(CConfig.getBackgroundColor(CConfig.GUI_COLOR_NON_HITTABLE));
                 cell.setForeground(CConfig.getForegroundColor(CConfig.GUI_COLOR_NON_HITTABLE));
-            } else if (mounted.getType() instanceof WeaponType || BattleArmorUtil.isFilledDwp(mounted)) {
-                // while misc themselves, DWP can only mount weapons and are, for GUI, effectively weapons
+            } else if (mounted.getType() instanceof WeaponType
+                  || BattleArmorUtil.isFilledDwp(mounted)
+                  || BattleArmorUtil.isFilledApm(mounted)) {
+                // DWP and APM can only mount weapons and, when not empty, should look like a weapon
                 cell.setBackground(CConfig.getBackgroundColor(CConfig.GUI_COLOR_WEAPONS));
                 cell.setForeground(CConfig.getForegroundColor(CConfig.GUI_COLOR_WEAPONS));
             } else if (mounted.getType() instanceof AmmoType) {
@@ -149,8 +151,10 @@ public final class CritCellUtil {
             }
             if (mounted.is(EquipmentTypeLookup.BA_DWP) && mounted.getLinked() != null) {
                 name = "[DWP] " + mounted.getLinked().getName();
-            }
-            if (mounted.getType().hasFlag(MiscType.F_AP_MOUNT) && mounted.getLinked() != null) {
+            } else if (mounted.is(EquipmentTypeLookup.BA_APM) && mounted.getLinked() != null) {
+                name = "[APM] " + mounted.getLinked().getName();
+            } else if (mounted.getType().hasFlag(MiscType.F_AP_MOUNT) && mounted.getLinked() != null) {
+                // armored gloves may also act as an APM, TM p.171
                 name += " (attached " + mounted.getLinked().getName() + ")";
             }
 

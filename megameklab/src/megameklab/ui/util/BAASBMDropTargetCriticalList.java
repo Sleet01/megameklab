@@ -276,30 +276,22 @@ public class BAASBMDropTargetCriticalList extends JList<String> implements Mouse
                     popup.add(menuItem);
                 }
 
-                    // Unattach from a DWP
-                    if (mount.is(EquipmentTypeLookup.BA_DWP) && (mount.getLinked() != null)) {
-                        menuItem = new JMenuItem("Remove attached weapon");
-                        menuItem.addActionListener(evt -> {
-                            BattleArmorUtil.emptyDwpApm(mount);
-                            doRefresh();
-                        });
-                        popup.add(menuItem);
-                    }
-
-                // Right-clicked on an AP Mount that has an attached weapon
-                if (mount.getType().hasFlag(MiscType.F_AP_MOUNT)
-                      && (mount.getLinked() != null)) {
+                // Unattach from a DWP
+                if (mount.is(EquipmentTypeLookup.BA_DWP) && (mount.getLinked() != null)) {
                     menuItem = new JMenuItem("Remove attached weapon");
                     menuItem.addActionListener(evt -> {
-                        Mounted<?> attached = mount.getLinked();
-                        attached.setAPMMounted(false);
-                        mount.setLinked(null);
-                        mount.setLinkedBy(null);
-                        attached.setLinked(null);
-                        attached.setLinkedBy(null);
-                        if (refresh != null) {
-                            refresh.refreshAll();
-                        }
+                        BattleArmorUtil.emptyDwpApm(mount);
+                        doRefresh();
+                    });
+                    popup.add(menuItem);
+                }
+
+                // Right-clicked on an AP Mount (can also be an armored glove) that has an attached weapon
+                if (mount.getType().hasFlag(MiscType.F_AP_MOUNT) && (mount.getLinked() != null)) {
+                    menuItem = new JMenuItem("Remove attached weapon");
+                    menuItem.addActionListener(evt -> {
+                        BattleArmorUtil.emptyDwpApm(mount);
+                        doRefresh();
                     });
                     popup.add(menuItem);
                 }

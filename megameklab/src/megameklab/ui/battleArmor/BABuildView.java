@@ -467,12 +467,11 @@ public class BABuildView extends IView implements ActionListener, MouseListener 
                         continue;
                     }
 
-                    // Armored gloves can only carry 1 additional weapon, regardless of the number of gloves
+                    // Armored gloves can only carry 1 additional weapon, regardless of the number of gloves, TM p.171
                     if (misc.getType().hasFlag(MiscType.F_ARMORED_GLOVE)) {
                         boolean hasUsedGlove = false;
                         for (Mounted<?> m2 : getBattleArmor().getMisc()) {
-                            if (m2.getType().hasFlag(MiscType.F_ARMORED_GLOVE)
-                                  && (m2.getLinked() != null)) {
+                            if (m2.getType().hasFlag(MiscType.F_ARMORED_GLOVE) && (m2.getLinked() != null)) {
                                 hasUsedGlove = true;
                             }
                         }
@@ -486,11 +485,8 @@ public class BABuildView extends IView implements ActionListener, MouseListener 
 
                     String locName = BattleArmor.MOUNT_LOC_NAMES[misc.getBaMountLoc()];
                     item = new JMenuItem("Mount in " + misc.getName() + " (" + locName + ")");
-                    final Mounted<?> apm = misc;
                     item.addActionListener(evt -> {
-                        eq.setLinked(apm);
-                        apm.setLinked(eq);
-                        eq.setAPMMounted(true);
+                        BattleArmorUtil.mountOnApm(eq, misc);
                         ((BABuildTab) getParent().getParent()).refreshAll();
                     });
                     popup.add(item);

@@ -37,6 +37,7 @@ import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.EquipmentTypeLookup;
+import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
@@ -169,6 +170,30 @@ public final class BattleArmorUtil {
     }
 
     /**
+     * Mounts the given weapon on the given Detachable Weapon Pack. Any previously mounted weapon is removed from it,
+     * becoming unallocated. Does nothing and logs a warning when the given dwp Mounted is not a DWP or the given weapon
+     * may not be mounted on a DWP.
+     *
+     * @param weapon The weapon to mount on the DWP
+     * @param apm    The DWP to receive the weapon
+     */
+    public static void mountOnApm(Mounted<?> weapon, Mounted<?> apm) {
+        if (!(apm instanceof MiscMounted miscMounted) || !miscMounted.getType().hasFlag(MiscType.F_AP_MOUNT)) {
+            LOGGER.warn("Trying to APM-mount on an item that is not an AP mount or armored glove!");
+            return;
+        }
+        if (!weapon.getType().hasFlag(WeaponType.F_INFANTRY)) {
+            LOGGER.warn("Trying to APM-mount invalid equipment!");
+            return;
+        }
+        emptyDwpApm(apm);
+        weapon.setLinkedBy(apm);
+        apm.setLinked(weapon);
+        weapon.setAPMMounted(true);
+        weapon.setBaMountLoc(BattleArmor.MOUNT_LOC_NONE);
+    }
+
+    /**
      * Empties the given Detachable Weapon Pack, removing any weapon mounted on it. Can be safely called (does nothing)
      * when there is no weapon on the DWP or the given Mounted is not a DWP (in this case, logs a warning).
      *
@@ -188,14 +213,14 @@ public final class BattleArmorUtil {
     }
 
     /**
-     * Empties the given APM or DWP, removing any weapon or other equipment attached to it. Can be safely called (does
-     * nothing) when there is no equipment on the given mount or the given mount is neither an APM nor DWP (in this
-     * case, logs a warning).
+     * Empties the given APM (including armored glove) or DWP, removing any weapon or other equipment attached to it.
+     * Can be safely called (does nothing) when there is no equipment on the given mount or the given mount is neither
+     * an APM nor DWP (in this case, logs a warning).
      *
      * @param mount The APM/DWP to empty
      */
     public static void emptyDwpApm(Mounted<?> mount) {
-        if (!mount.is(EquipmentTypeLookup.BA_DWP) && !mount.is(EquipmentTypeLookup.BA_APM)) {
+        if (!mount.is(EquipmentTypeLookup.BA_DWP) && !mount.getType().hasFlag(MiscType.F_AP_MOUNT)) {
             LOGGER.warn("Trying to unattach equipment from something that is neither APM nor DWP!");
             return;
         }
@@ -257,13 +282,10 @@ public final class BattleArmorUtil {
     public static void removeAllCriticalSlotsFrom(BattleArmor battleArmor, List<Integer> locations) {
         battleArmor.getEquipment()
               .stream()
-              .filter(m -> (m != null) && (m.getBaMountLoc() != BattleArmor.MOUNT_LOC_NONE))
+              .filter(m -> m.getBaMountLoc() != BattleArmor.MOUNT_LOC_NONE)
               .filter(m -> !UnitUtil.isFixedLocationSpreadEquipment(m.getType()))
               .filter(m -> locations.contains(m.getBaMountLoc()))
-              .forEach(m -> {
-                  m.setBaMountLoc(BattleArmor.MOUNT_LOC_NONE);
-                  UnitUtil.changeMountStatus(battleArmor, m, BattleArmor.LOC_SQUAD, BattleArmor.LOC_SQUAD, false);
-              });
+              .forEach(m -> unallocateMounted(battleArmor, m));
     }
 
     private BattleArmorUtil() {
