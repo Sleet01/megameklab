@@ -109,18 +109,17 @@ public final class CritCellUtil {
             if (mounted == null) {
                 cell.setBackground(CConfig.getBackgroundColor(CConfig.GUI_COLOR_EMPTY));
                 cell.setForeground(CConfig.getForegroundColor(CConfig.GUI_COLOR_EMPTY));
-            } else if (!mounted.getType().isHittable()) {
-                cell.setBackground(CConfig.getBackgroundColor(CConfig.GUI_COLOR_NON_HITTABLE));
-                cell.setForeground(CConfig.getForegroundColor(CConfig.GUI_COLOR_NON_HITTABLE));
             } else if (mounted.getType() instanceof WeaponType
-                  || BattleArmorUtil.isFilledDwp(mounted)
-                  || BattleArmorUtil.isFilledApm(mounted)) {
-                // DWP and APM can only mount weapons and, when not empty, should look like a weapon
+                  || BattleArmorUtil.isFilledWeaponMount(mounted)) {
+                // Armored gloves, DWP and APM can only mount weapons and, when not empty, should look like a weapon
                 cell.setBackground(CConfig.getBackgroundColor(CConfig.GUI_COLOR_WEAPONS));
                 cell.setForeground(CConfig.getForegroundColor(CConfig.GUI_COLOR_WEAPONS));
             } else if (mounted.getType() instanceof AmmoType) {
                 cell.setBackground(CConfig.getBackgroundColor(CConfig.GUI_COLOR_AMMO));
                 cell.setForeground(CConfig.getForegroundColor(CConfig.GUI_COLOR_AMMO));
+            } else if (!mounted.getType().isHittable()) {
+                cell.setBackground(CConfig.getBackgroundColor(CConfig.GUI_COLOR_NON_HITTABLE));
+                cell.setForeground(CConfig.getForegroundColor(CConfig.GUI_COLOR_NON_HITTABLE));
             } else {
                 cell.setBackground(CConfig.getBackgroundColor(CConfig.GUI_COLOR_EQUIPMENT));
                 cell.setForeground(CConfig.getForegroundColor(CConfig.GUI_COLOR_EQUIPMENT));

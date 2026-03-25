@@ -170,12 +170,12 @@ public final class BattleArmorUtil {
     }
 
     /**
-     * Mounts the given weapon on the given Detachable Weapon Pack. Any previously mounted weapon is removed from it,
-     * becoming unallocated. Does nothing and logs a warning when the given dwp Mounted is not a DWP or the given weapon
-     * may not be mounted on a DWP.
+     * Mounts the given weapon on the given Anti-Personnel Weapon Mount, which may be either the misc item or an armored
+     * glove. Any previously mounted weapon is removed from it, becoming unallocated. Does nothing and logs a warning
+     * when the given apm Mounted is not a suitable AP mount or the given weapon may not be mounted on an APM.
      *
-     * @param weapon The weapon to mount on the DWP
-     * @param apm    The DWP to receive the weapon
+     * @param weapon The weapon to mount on the APM
+     * @param apm    The APM to receive the weapon
      */
     public static void mountOnApm(Mounted<?> weapon, Mounted<?> apm) {
         if (!(apm instanceof MiscMounted miscMounted) || !miscMounted.getType().hasFlag(MiscType.F_AP_MOUNT)) {
@@ -263,7 +263,8 @@ public final class BattleArmorUtil {
     }
 
     /**
-     * @return True when the given mounted is an Anti-Personnel weapon mount and it has a weapon allocated to it.
+     * @return True when the given mounted is an Anti-Personnel weapon mount (only the misc item, not an armored glove!)
+     *       and it has a weapon allocated to it.
      */
     public static boolean isFilledApm(Mounted<?> mounted) {
         return mounted.is(EquipmentTypeLookup.BA_APM) && mounted.getLinked() != null;
@@ -289,6 +290,12 @@ public final class BattleArmorUtil {
               .filter(m -> !UnitUtil.isFixedLocationSpreadEquipment(m.getType()))
               .filter(m -> locations.contains(m.getBaMountLoc()))
               .forEach(m -> unallocateMounted(battleArmor, m));
+    }
+
+    public static boolean isFilledWeaponMount(Mounted<?> mounted) {
+        return isFilledDwp(mounted) || isFilledApm(mounted)
+              || (mounted.getType().hasFlag(MiscType.F_AP_MOUNT) && mounted.getLinked() != null);
+
     }
 
     private BattleArmorUtil() {

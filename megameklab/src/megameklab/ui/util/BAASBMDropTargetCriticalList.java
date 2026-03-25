@@ -113,11 +113,11 @@ public class BAASBMDropTargetCriticalList extends JList<String> implements Mouse
         this.refresh = refresh;
         transferHandler.setRefresh(refresh);
     }
-    
+
     /**
      * Sets the 0-crit equipment displayed as virtual slots beyond the normal critical slot count.
      *
-     * @param mounts         the list of 0-crit Mounted equipment for this location
+     * @param mounts          the list of 0-crit Mounted equipment for this location
      * @param normalCritCount the number of normal (physical) critical slots
      */
     public void setZeroCritMounts(List<Mounted<?>> mounts, int normalCritCount) {
@@ -127,8 +127,8 @@ public class BAASBMDropTargetCriticalList extends JList<String> implements Mouse
     }
 
     /**
-     * Returns true if the currently selected index corresponds to a virtual (0-crit) slot
-     * rather than a normal critical slot.
+     * Returns true if the currently selected index corresponds to a virtual (0-crit) slot rather than a normal critical
+     * slot.
      */
     public boolean isVirtualSlotSelected() {
         return getSelectedIndex() >= normalCritCount;
@@ -207,12 +207,12 @@ public class BAASBMDropTargetCriticalList extends JList<String> implements Mouse
                     menuItem = new JMenuItem("Remove " + mount.getName());
                     menuItem.addActionListener(evt -> removeCrit());
                     popup.add(menuItem);
-                    }
-                    if (!((getUnit() instanceof BattleArmor)
-                          && UnitUtil.isFixedLocationSpreadEquipment(mount.getType()))
-                          && !UnitUtil.isHeatSink(mount)
-                          && !UnitUtil.isJumpJet(mount)) {
-                        menuItem = new JMenuItem("Delete " + mount.getName());
+                }
+                if (!((getUnit() instanceof BattleArmor)
+                      && UnitUtil.isFixedLocationSpreadEquipment(mount.getType()))
+                      && !UnitUtil.isHeatSink(mount)
+                      && !UnitUtil.isJumpJet(mount)) {
+                    menuItem = new JMenuItem("Delete " + mount.getName());
                     menuItem.addActionListener(ev -> removeMount());
                     popup.add(menuItem);
                 }
@@ -467,7 +467,7 @@ public class BAASBMDropTargetCriticalList extends JList<String> implements Mouse
             }
             return null;
         }
-                
+
         // Check for virtual slot (0-crit equipment)
         int selectedIndex = getSelectedIndex();
         if (selectedIndex >= normalCritCount) {
@@ -680,10 +680,11 @@ public class BAASBMDropTargetCriticalList extends JList<String> implements Mouse
     }
 
     /**
-     * Determines if armoring can be added to a critical slot.
-     * Armoring is not allowed for Superheavy meks or Interface Cockpit slots.
+     * Determines if armoring can be added to a critical slot. Armoring is not allowed for Superheavy meks or Interface
+     * Cockpit slots.
      *
      * @param cs The critical slot to check
+     *
      * @return true if armoring is allowed, false otherwise
      */
     private boolean canAddArmoringToCriticalSlot(CriticalSlot cs) {
