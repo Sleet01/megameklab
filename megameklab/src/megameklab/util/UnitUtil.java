@@ -121,40 +121,42 @@ public class UnitUtil {
     }
 
     /**
-     * Tells us if the passed in {@link EquipmentType} is equipment that uses critical slots/mounted and is spread
-     * across multiple locations
+     * Returns true for MiscTypes that are fixed to a single location or to multiple locations; in other words, those
+     * Miscs for which there is no location choice when placing them on a unit. Returns false for anything that is not a
+     * MiscType and equipment that can be placed with some choice at least. When this method returns true, the misc in
+     * question should not go unallocated on a unit; also, if it cannot be present more than once it should not be
+     * offered in the equipment tab (where it can be added multiple times). Rather, its placement should be handled by
+     * some checkbox or other GUI item.
      * <p>
-     * This batch of checks should be moved to the {@link MiscType} class and simplified vs a massive list here. Can be
-     * a flag on the MiscType to denote "Fixed Location" and "Spread Equipment." MiscType#spreadable is already present
-     * on the MiscType so adding the field just like MiscType#omniFixedOnly.
+     * Dev note: Once this method has a very clear contract, suitable fields in MiscType could be used for it instead.
+     * Currently, this method is probably incomplete, unclear on what it's used for exactly and the exact use of the
+     * equipment field "spreadable" is also not clarified.
      *
-     * @param eq The equipment to test
+     * @param equipmentType The equipment to test
      *
-     * @return True if EquipmentType is of MiscType, is Fixed, and is spread across multiple locations.
+     * @return True if the equipment type is a MiscType and placed in one or more fixed locations
      */
-    public static boolean isFixedLocationSpreadEquipment(EquipmentType eq) {
-        return (eq instanceof MiscType) &&
-              (eq.hasFlag(MiscType.F_JUMP_BOOSTER) ||
-                    eq.hasFlag(MiscType.F_BA_MANIPULATOR) ||
-                    eq.hasFlag(MiscType.F_PARTIAL_WING) ||
-                    eq.hasFlag(MiscType.F_NULL_SIG) ||
-                    eq.hasFlag(MiscType.F_VOID_SIG) ||
-                    eq.hasFlag(MiscType.F_ENVIRONMENTAL_SEALING) ||
-                    eq.hasFlag(MiscType.F_TRACKS) ||
-                    eq.hasFlag(MiscType.F_TALON) ||
-                    (eq.hasFlag(MiscType.F_STEALTH) &&
-                          (eq.hasFlag(MiscType.F_MEK_EQUIPMENT) || eq.hasFlag(MiscType.F_TANK_EQUIPMENT))) ||
-                    eq.hasFlag(MiscType.F_CHAMELEON_SHIELD) ||
-                    eq.hasFlag(MiscType.F_BLUE_SHIELD) ||
-                    eq.hasFlag(MiscType.F_MAST_MOUNT) ||
-                    eq.hasFlag(MiscType.F_SCM) ||
-                    eq.hasFlag(MiscType.F_CHAIN_DRAPE) ||
-                    (eq.hasFlag(MiscType.F_RAM_PLATE) ||
-                          (eq.hasFlag(MiscType.F_JUMP_JET) && eq.hasFlag(MiscType.F_PROTOMEK_EQUIPMENT)) ||
-                          (eq.hasFlag(MiscType.F_UMU) && eq.hasFlag(MiscType.F_PROTOMEK_EQUIPMENT)) ||
-                          (eq.hasFlag(MiscType.F_MAGNETIC_CLAMP) &&
-                                eq.hasFlag(MiscType.F_PROTOMEK_EQUIPMENT)) ||
-                          (eq.hasFlag(MiscType.F_MASC) && eq.hasFlag(MiscType.F_PROTOMEK_EQUIPMENT))));
+    public static boolean isFixedLocationSpreadEquipment(EquipmentType equipmentType) {
+        return (equipmentType instanceof MiscType miscType) && (miscType.hasFlag(MiscType.F_JUMP_BOOSTER)
+              || miscType.hasFlag(MiscType.F_BA_MANIPULATOR)
+              || miscType.hasFlag(MiscType.F_PARTIAL_WING)
+              || miscType.hasFlag(MiscType.F_NULL_SIG)
+              || miscType.hasFlag(MiscType.F_VOID_SIG)
+              || miscType.hasFlag(MiscType.F_ENVIRONMENTAL_SEALING)
+              || miscType.hasFlag(MiscType.F_TRACKS)
+              || miscType.hasFlag(MiscType.F_TALON)
+              || (miscType.hasFlag(MiscType.F_STEALTH)
+                && (miscType.hasFlag(MiscType.F_MEK_EQUIPMENT) || miscType.hasFlag(MiscType.F_TANK_EQUIPMENT)))
+              || miscType.hasFlag(MiscType.F_CHAMELEON_SHIELD)
+              || miscType.hasFlag(MiscType.F_BLUE_SHIELD)
+              || miscType.hasFlag(MiscType.F_MAST_MOUNT)
+              || miscType.hasFlag(MiscType.F_SCM)
+              || miscType.hasFlag(MiscType.F_CHAIN_DRAPE)
+              || miscType.hasFlag(MiscType.F_RAM_PLATE)
+              || (miscType.hasFlag(MiscType.F_JUMP_JET) && miscType.hasFlag(MiscType.F_PROTOMEK_EQUIPMENT))
+              || (miscType.hasFlag(MiscType.F_UMU) && miscType.hasFlag(MiscType.F_PROTOMEK_EQUIPMENT))
+              || (miscType.hasFlag(MiscType.F_MAGNETIC_CLAMP) && miscType.hasFlag(MiscType.F_PROTOMEK_EQUIPMENT))
+              || (miscType.hasFlag(MiscType.F_MASC) && miscType.hasFlag(MiscType.F_PROTOMEK_EQUIPMENT)));
     }
 
     /**
@@ -266,39 +268,9 @@ public class UnitUtil {
     public static void removeMounted(Entity unit, Mounted<?> mount) {
         UnitUtil.removeCriticalSlots(unit, mount);
 
-        // Some special checks for BA
-        if (unit instanceof BattleArmor) {
-            // If we're removing a DWP, and it has an attached weapon, we need to detach the weapon
-            if (mount.getType().hasFlag(MiscType.F_DETACHABLE_WEAPON_PACK) && (mount.getLinked() != null)) {
-                Mounted<?> link = mount.getLinked();
-                link.setDWPMounted(false);
-                link.setLinked(null);
-                link.setLinkedBy(null);
-            }
-
-            // If we are removing a weapon that is mounted in an DWP, we need to clear the mounted status of the DWP
-            if ((mount.getLinkedBy() != null) &&
-                  mount.getLinkedBy().getType().hasFlag(MiscType.F_DETACHABLE_WEAPON_PACK)) {
-                Mounted<?> dwp = mount.getLinkedBy();
-                dwp.setLinked(null);
-                dwp.setLinkedBy(null);
-            }
-
-            // If we're removing an APM, and it has an attached weapon, we need to detach the weapon
-            if (mount.getType().hasFlag(MiscType.F_AP_MOUNT) && (mount.getLinked() != null)) {
-                Mounted<?> link = mount.getLinked();
-                link.setAPMMounted(false);
-                link.setLinked(null);
-                link.setLinkedBy(null);
-            }
-
-            // If we're removing a weapon that is mounted in an APM, we need to clear the mounted status of the AP
-            // Mount.
-            if ((mount.getLinkedBy() != null) && mount.getLinkedBy().getType().hasFlag(MiscType.F_AP_MOUNT)) {
-                Mounted<?> apm = mount.getLinkedBy();
-                apm.setLinked(null);
-                apm.setLinkedBy(null);
-            }
+        if (unit instanceof BattleArmor battleArmor) {
+            // DWP and APM require special treatment
+            BattleArmorUtil.unallocateMounted(battleArmor, mount);
         }
 
         // We will need to reset the equipment numbers of the bay ammo and weapons
@@ -1147,16 +1119,6 @@ public class UnitUtil {
 
     public static void loadFonts() {
         Font font = Font.decode(CConfig.getParam(CConfig.RS_FONT, "Eurostile"));
-
-        // If the font is not installed, use system default sans
-        if (null == font) {
-            font = Font.decode(Font.SANS_SERIF);
-        }
-
-        // If that still doesn't work, get the default dialog font
-        if (null == font) {
-            font = Font.decode(null);
-        }
         rsFont = font.deriveFont(Font.PLAIN, 8);
         rsBoldFont = font.deriveFont(Font.BOLD, 8);
     }

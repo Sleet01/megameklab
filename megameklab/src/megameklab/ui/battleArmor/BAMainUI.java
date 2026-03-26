@@ -200,6 +200,7 @@ public class BAMainUI extends MegaMekLabMainUI {
     public void refreshEquipmentTable() {
         super.refreshEquipmentTable();
         equipTab.refreshTable();
+        equipTab.refresh();
         floatingEquipmentDatabase.refresh();
     }
 
