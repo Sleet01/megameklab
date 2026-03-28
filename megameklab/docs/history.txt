@@ -1,5 +1,7 @@
 MEGAMEKLAB VERSION HISTORY:
 ----------------
+0.50.13
+
 0.50.12 (2026-03-28 2100 UTC)
 ## What's Changed
 * Add Prosthetic Enhancement UI for Conventional Infantry (IO p.84) by @HammerGS in https://github.com/MegaMek/megameklab/pull/2101
