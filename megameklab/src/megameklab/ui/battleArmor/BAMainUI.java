@@ -47,6 +47,7 @@ import megamek.common.TechConstants;
 import megameklab.ui.MegaMekLabMainUI;
 import megameklab.ui.dialog.FloatingEquipmentDatabaseDialog;
 import megameklab.ui.generalUnit.FluffTab;
+import megameklab.ui.generalUnit.PreviewTab;
 import megameklab.ui.generalUnit.QuirksTab;
 import megameklab.ui.util.TabScrollPane;
 
@@ -57,6 +58,7 @@ public class BAMainUI extends MegaMekLabMainUI {
     private BAEquipmentTab equipTab;
     private FluffTab fluffTab;
     private BAStatusBar statusbar;
+    private PreviewTab previewTab;
 
     @Override
     protected FluffTab getFluffTab() {
@@ -87,6 +89,7 @@ public class BAMainUI extends MegaMekLabMainUI {
         quirksTab = new QuirksTab(this);
         statusbar = new BAStatusBar(this);
         buildTab = new BABuildTab(this);
+        previewTab = new PreviewTab(this);
         structureTab.addRefreshedListener(this);
         equipTab.addRefreshedListener(this);
         buildTab.addRefreshedListener(this);
@@ -99,6 +102,7 @@ public class BAMainUI extends MegaMekLabMainUI {
         configPane.addTab("Assign Criticals", new TabScrollPane(buildTab));
         configPane.addTab("Fluff", new TabScrollPane(fluffTab));
         configPane.addTab("Quirks", new TabScrollPane(quirksTab, quirksTab.refreshOnShow));
+        configPane.addTab("Preview", previewTab);
 
         add(configPane, BorderLayout.CENTER);
         add(statusbar, BorderLayout.SOUTH);
@@ -144,6 +148,7 @@ public class BAMainUI extends MegaMekLabMainUI {
         refreshBuild();
         refreshPreview();
         refreshHeader();
+        refreshPreview();
     }
 
     @Override
@@ -188,7 +193,7 @@ public class BAMainUI extends MegaMekLabMainUI {
     @Override
     public void refreshPreview() {
         super.refreshPreview();
-        structureTab.refreshPreview();
+        previewTab.refresh();
     }
 
     @Override
