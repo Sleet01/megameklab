@@ -41,6 +41,7 @@ import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
+import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.units.Entity;
 import megamek.common.weapons.attacks.LegAttack;
 import megamek.common.weapons.attacks.StopSwarmAttack;
@@ -235,15 +236,15 @@ public final class BattleArmorUtil {
 
     /**
      * Unallocates (removes from arm/body etc to the unallocated equipment list) the given mounted. For special mounts
-     * for other equipment (DWP etc), that other equipment is removed from this mount first, emptying the given
-     * mounted. This method will unallocate regardless of the type of equipment, i.e., it does not check if this
-     * equipment should ever go unallocated (e.g. fixed location equipment). It is therefore up to the caller to
-     * select equipment to unallocate.
+     * for other equipment (DWP etc), that other equipment is removed from this mount first, emptying the given mounted.
+     * This method will unallocate regardless of the type of equipment, i.e., it does not check if this equipment should
+     * ever go unallocated (e.g. fixed location equipment). It is therefore up to the caller to select equipment to
+     * unallocate.
      *
      * @param mounted The equipment to unallocate
      */
     public static void unallocateMounted(BattleArmor battleArmor, Mounted<?> mounted) {
-        if (isFilledDwp(mounted) || isFilledApm(mounted)) {
+        if (isFilledDwp(mounted) || isFilledApm(mounted) || isFilledArmoredGlove(mounted)) {
             emptyDwpApm(mounted);
         }
         if ((mounted.isAPMMounted() || mounted.isDWPMounted()) && mounted.getLinkedBy() != null) {
@@ -271,6 +272,13 @@ public final class BattleArmorUtil {
     }
 
     /**
+     * @return True when the given mounted is an Armored Glove manipulator and it has an AP weapon allocated to it.
+     */
+    public static boolean isFilledArmoredGlove(Mounted<?> mounted) {
+        return mounted.getType().hasFlag(MiscTypeFlag.F_ARMORED_GLOVE) && mounted.getLinked() != null;
+    }
+
+    /**
      * Removes all critical slots for the given BA, unallocating all equipment (i.e., placing it into
      * BattleArmor.MOUNT_LOC_NONE and BattleArmor.LOC_SQUAD).
      */
@@ -280,8 +288,8 @@ public final class BattleArmorUtil {
 
     /**
      * Removes all critical slots from the given locations for the given BA, unallocating all equipment in those
-     * locations (i.e., placing it into BattleArmor.MOUNT_LOC_NONE and BattleArmor.LOC_SQUAD). Fixed location
-     * equipment is not affected (it is left in place).
+     * locations (i.e., placing it into BattleArmor.MOUNT_LOC_NONE and BattleArmor.LOC_SQUAD). Fixed location equipment
+     * is not affected (it is left in place).
      */
     public static void removeAllCriticalSlotsFrom(BattleArmor battleArmor, List<Integer> locations) {
         battleArmor.getEquipment()
@@ -295,7 +303,17 @@ public final class BattleArmorUtil {
     public static boolean isFilledWeaponMount(Mounted<?> mounted) {
         return isFilledDwp(mounted) || isFilledApm(mounted)
               || (mounted.getType().hasFlag(MiscType.F_AP_MOUNT) && mounted.getLinked() != null);
+    }
 
+    /**
+     * Removes all manipulator equipment, including Modular Equipment Adaptors, from the unit.
+     *
+     * @param battleArmor The BA
+     */
+    public static void removeManipulatorEquipment(BattleArmor battleArmor) {
+        UnitUtil.removeAllMounted(battleArmor, EquipmentType.get(EquipmentTypeLookup.BA_MODULAR_EQUIPMENT_ADAPTOR));
+        // UnitUtil calls unallocateMounted to unallocate attached AP weapons
+        UnitUtil.removeAllMiscMounted(battleArmor, MiscTypeFlag.F_BA_MANIPULATOR);
     }
 
     private BattleArmorUtil() {

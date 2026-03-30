@@ -62,7 +62,7 @@ import static megamek.common.equipment.EquipmentTypeLookup.BA_MODULAR_EQUIPMENT_
 
 public class BAManipulatorView extends IView {
 
-    private static final MMLogger LOGGER = MMLogger.create(BAStructureTab.class);
+    private static final MMLogger LOGGER = MMLogger.create(BAManipulatorView.class);
     private static final ResourceBundle I18N = ResourceBundle.getBundle("megameklab.resources.Views");
     private static final String COMBO_ERROR =
           "Manipulator Combo choice could not be parsed to TestBattleArmor.BAManipulator object: %s";
@@ -294,21 +294,21 @@ public class BAManipulatorView extends IView {
      * @param mountLoc       one of the two arm locations (MOUNT_LOC_x_ARM)
      */
     private void setManipulators(TestBattleArmor.BAManipulator newManipulator, int mountLoc) {
-        if (mountLoc != MOUNT_LOC_LEFT_ARM && mountLoc != MOUNT_LOC_RIGHT_ARM) {
-            throw new IllegalArgumentException("Invalid location (must be arm)");
+        MiscMounted currentManipulator = getBattleArmor().getManipulator(mountLoc);
+        if (currentManipulator != null) {
+            UnitUtil.removeMounted(getBattleArmor(), currentManipulator);
         }
-
-        Optional<MiscMounted> currentManipulator = getManipulator(mountLoc);
-        currentManipulator.ifPresent(miscMounted -> UnitUtil.removeMounted(getBattleArmor(), miscMounted));
         setManipulator(newManipulator, mountLoc);
 
         if (newManipulator.pairMounted) {
             setManipulator(newManipulator, otherArm(mountLoc));
 
-        } else if (currentManipulator.isPresent() && isPairedManipulator(currentManipulator.get().getType())) {
-            // when the previous manipulator was pairmounted but the new one is not, remove the old on the other arm
-            getManipulator(otherArm(mountLoc))
-                  .ifPresent(miscMounted -> UnitUtil.removeMounted(getBattleArmor(), miscMounted));
+        } else if (currentManipulator != null && isPairedManipulator(currentManipulator.getType())) {
+            // when the previous manipulator was pair-mounted but the new one is not, remove the old on the other arm
+            MiscMounted secondManipulator = getBattleArmor().getManipulator(otherArm(mountLoc));
+            if (secondManipulator != null) {
+                UnitUtil.removeMounted(getBattleArmor(), currentManipulator);
+            }
         }
     }
 

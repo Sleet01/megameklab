@@ -340,6 +340,7 @@ public class BAStructureTab extends ITab implements BABuildListener, ArmorAlloca
     @Override
     public void chassisTypeChanged(int chassisType) {
         getBattleArmor().setChassisType(chassisType);
+        BattleArmorUtil.removeManipulatorEquipment(getBattleArmor());
         BattleArmorUtil.removeAllCriticalSlotsFrom(getBattleArmor(),
               List.of(BattleArmor.MOUNT_LOC_LEFT_ARM, BattleArmor.MOUNT_LOC_RIGHT_ARM, BattleArmor.MOUNT_LOC_TURRET));
         panBasicInfo.setFromEntity(getBattleArmor());

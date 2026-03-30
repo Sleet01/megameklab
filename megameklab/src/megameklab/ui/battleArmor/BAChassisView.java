@@ -118,6 +118,7 @@ public class BAChassisView extends BuildView implements ActionListener, ChangeLi
               "BAChassisView.cbWeightClass.tooltip"), gbc);
         gbc.gridx = 1;
         cbWeightClass.setToolTipText(resourceMap.getString("BAChassisView.cbWeightClass.tooltip"));
+        cbWeightClass.setPrototypeDisplayValue(0);
         add(cbWeightClass, gbc);
         cbWeightClass.addActionListener(this);
 
