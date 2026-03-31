@@ -37,11 +37,11 @@ import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.EquipmentTypeLookup;
-import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
 import megamek.common.equipment.enums.MiscTypeFlag;
+import megamek.common.units.BaConstructionUtil;
 import megamek.common.units.Entity;
 import megamek.common.weapons.attacks.LegAttack;
 import megamek.common.weapons.attacks.StopSwarmAttack;
@@ -51,6 +51,8 @@ import megamek.logging.MMLogger;
 
 import java.util.List;
 import java.util.stream.IntStream;
+
+import static megamek.common.units.BaConstructionUtil.*;
 
 public final class BattleArmorUtil {
 
@@ -171,30 +173,6 @@ public final class BattleArmorUtil {
     }
 
     /**
-     * Mounts the given weapon on the given Anti-Personnel Weapon Mount, which may be either the misc item or an armored
-     * glove. Any previously mounted weapon is removed from it, becoming unallocated. Does nothing and logs a warning
-     * when the given apm Mounted is not a suitable AP mount or the given weapon may not be mounted on an APM.
-     *
-     * @param weapon The weapon to mount on the APM
-     * @param apm    The APM to receive the weapon
-     */
-    public static void mountOnApm(Mounted<?> weapon, Mounted<?> apm) {
-        if (!(apm instanceof MiscMounted miscMounted) || !miscMounted.getType().hasFlag(MiscType.F_AP_MOUNT)) {
-            LOGGER.warn("Trying to APM-mount on an item that is not an AP mount or armored glove!");
-            return;
-        }
-        if (!weapon.getType().hasFlag(WeaponType.F_INFANTRY)) {
-            LOGGER.warn("Trying to APM-mount invalid equipment!");
-            return;
-        }
-        emptyDwpApm(apm);
-        weapon.setLinkedBy(apm);
-        apm.setLinked(weapon);
-        weapon.setAPMMounted(true);
-        weapon.setBaMountLoc(BattleArmor.MOUNT_LOC_NONE);
-    }
-
-    /**
      * Empties the given Detachable Weapon Pack, removing any weapon mounted on it. Can be safely called (does nothing)
      * when there is no weapon on the DWP or the given Mounted is not a DWP (in this case, logs a warning).
      *
@@ -221,17 +199,7 @@ public final class BattleArmorUtil {
      * @param mount The APM/DWP to empty
      */
     public static void emptyDwpApm(Mounted<?> mount) {
-        if (!mount.is(EquipmentTypeLookup.BA_DWP) && !mount.getType().hasFlag(MiscType.F_AP_MOUNT)) {
-            LOGGER.warn("Trying to unattach equipment from something that is neither APM nor DWP!");
-            return;
-        }
-        if (mount.getLinked() != null) {
-            Mounted<?> attachedEquipment = mount.getLinked();
-            attachedEquipment.setLinkedBy(null);
-            attachedEquipment.setDWPMounted(false);
-            attachedEquipment.setAPMMounted(false);
-            mount.setLinked(null);
-        }
+        BaConstructionUtil.emptyDwpApm(mount);
     }
 
     /**
@@ -244,38 +212,7 @@ public final class BattleArmorUtil {
      * @param mounted The equipment to unallocate
      */
     public static void unallocateMounted(BattleArmor battleArmor, Mounted<?> mounted) {
-        if (isFilledDwp(mounted) || isFilledApm(mounted) || isFilledArmoredGlove(mounted)) {
-            emptyDwpApm(mounted);
-        }
-        if ((mounted.isAPMMounted() || mounted.isDWPMounted()) && mounted.getLinkedBy() != null) {
-            emptyDwpApm(mounted.getLinkedBy());
-        }
-        mounted.setDWPMounted(false);
-        mounted.setAPMMounted(false);
-        mounted.setBaMountLoc(BattleArmor.MOUNT_LOC_NONE);
-        UnitUtil.changeMountStatus(battleArmor, mounted, BattleArmor.LOC_SQUAD, BattleArmor.LOC_SQUAD, false);
-    }
-
-    /**
-     * @return True when the given mounted is a Detachable Weapon Pack and it has a weapon allocated to it.
-     */
-    public static boolean isFilledDwp(Mounted<?> mounted) {
-        return mounted.is(EquipmentTypeLookup.BA_DWP) && mounted.getLinked() != null;
-    }
-
-    /**
-     * @return True when the given mounted is an Anti-Personnel weapon mount (only the misc item, not an armored glove!)
-     *       and it has a weapon allocated to it.
-     */
-    public static boolean isFilledApm(Mounted<?> mounted) {
-        return mounted.is(EquipmentTypeLookup.BA_APM) && mounted.getLinked() != null;
-    }
-
-    /**
-     * @return True when the given mounted is an Armored Glove manipulator and it has an AP weapon allocated to it.
-     */
-    public static boolean isFilledArmoredGlove(Mounted<?> mounted) {
-        return mounted.getType().hasFlag(MiscTypeFlag.F_ARMORED_GLOVE) && mounted.getLinked() != null;
+        BaConstructionUtil.unallocateMounted(battleArmor, mounted);
     }
 
     /**

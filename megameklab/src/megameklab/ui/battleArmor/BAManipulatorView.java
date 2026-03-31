@@ -36,6 +36,7 @@ import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
+import megamek.common.equipment.Mounted;
 import megamek.common.exceptions.LocationFullException;
 import megamek.common.interfaces.ITechManager;
 import megamek.common.verifier.TestBattleArmor;
@@ -162,7 +163,7 @@ public class BAManipulatorView extends IView {
             Vector<String> validManipulators = new Vector<>();
             validManipulators.add(BattleArmor.MANIPULATOR_TYPE_STRINGS[BattleArmor.MANIPULATOR_NONE]);
             for (TestBattleArmor.BAManipulator manipulator : TestBattleArmor.BAManipulator.values()) {
-                EquipmentType et = getMisc(manipulator);
+                EquipmentType et = manipulator.getMiscMounted();
                 if ((null != et) && techManager.isLegal(et)) {
                     validManipulators.add(et.getName());
                 }
@@ -324,18 +325,14 @@ public class BAManipulatorView extends IView {
         Optional<MiscMounted> currentManipulator = getManipulator(mountLoc);
         currentManipulator.ifPresent(miscMounted -> UnitUtil.removeMounted(getBattleArmor(), miscMounted));
         if (newManipulator != TestBattleArmor.BAManipulator.NONE) {
-            MiscMounted newMount = new MiscMounted(getBattleArmor(), getMisc(newManipulator));
-            newMount.setBaMountLoc(mountLoc);
             try {
-                getBattleArmor().addEquipment(newMount, BattleArmor.LOC_SQUAD, false);
+                Mounted<?> manipulator = getBattleArmor().addEquipment(newManipulator.getMiscMounted(),
+                      BattleArmor.LOC_SQUAD);
+                manipulator.setBaMountLoc(mountLoc);
             } catch (LocationFullException ex) {
                 LOGGER.error("Could not mount {}", newManipulator, ex);
             }
         }
-    }
-
-    private MiscType getMisc(TestBattleArmor.BAManipulator baManipulator) {
-        return (MiscType) EquipmentType.get(baManipulator.internalName);
     }
 
     private int otherArm(int armLocation) {
