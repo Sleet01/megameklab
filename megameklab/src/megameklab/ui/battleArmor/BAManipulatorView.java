@@ -39,6 +39,7 @@ import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.exceptions.LocationFullException;
 import megamek.common.interfaces.ITechManager;
+import megamek.common.units.ConstructionUtil;
 import megamek.common.verifier.TestBattleArmor;
 import megamek.logging.MMLogger;
 import megameklab.ui.EntitySource;
@@ -252,7 +253,7 @@ public class BAManipulatorView extends IView {
         } else {
             var modularMount = getModularMount(location);
             if (modularMount.isPresent()) {
-                UnitUtil.removeMounted(getBattleArmor(), modularMount.get());
+                ConstructionUtil.removeMounted(getBattleArmor(), modularMount.get());
                 doRefresh();
             }
         }
