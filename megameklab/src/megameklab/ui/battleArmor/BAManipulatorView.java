@@ -34,6 +34,7 @@ package megameklab.ui.battleArmor;
 
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
@@ -61,6 +62,7 @@ import java.util.Vector;
 import static megamek.common.battleArmor.BattleArmor.MOUNT_LOC_LEFT_ARM;
 import static megamek.common.battleArmor.BattleArmor.MOUNT_LOC_RIGHT_ARM;
 import static megamek.common.equipment.EquipmentTypeLookup.BA_MODULAR_EQUIPMENT_ADAPTOR;
+import static megamek.common.verifier.TestBattleArmor.BAManipulator;
 
 public class BAManipulatorView extends IView {
 
@@ -84,6 +86,7 @@ public class BAManipulatorView extends IView {
     private final ITechManager techManager;
     private RefreshListener refreshListener;
 
+    /** Set to true whenever input fields are changed programmatically. Listeners ignore events when true. */
     private boolean ignoreEvents = false;
 
     public BAManipulatorView(EntitySource eSource, ITechManager techManager) {
@@ -163,8 +166,8 @@ public class BAManipulatorView extends IView {
 
             Vector<String> validManipulators = new Vector<>();
             validManipulators.add(BattleArmor.MANIPULATOR_TYPE_STRINGS[BattleArmor.MANIPULATOR_NONE]);
-            for (TestBattleArmor.BAManipulator manipulator : TestBattleArmor.BAManipulator.values()) {
-                EquipmentType et = manipulator.getMiscMounted();
+            for (BAManipulator manipulator : BAManipulator.values()) {
+                EquipmentType et = manipulator.miscType();
                 if ((null != et) && techManager.isLegal(et)) {
                     validManipulators.add(et.getName());
                 }
@@ -173,16 +176,22 @@ public class BAManipulatorView extends IView {
             leftManipulatorSelect.setModel(new DefaultComboBoxModel<>(validManipulators));
             rightManipulatorSelect.setModel(new DefaultComboBoxModel<>(validManipulators));
 
-            TestBattleArmor.BAManipulator manipulator = TestBattleArmor.BAManipulator.getManipulator(getBattleArmor().getLeftManipulatorName());
+            BAManipulator manipulator = BAManipulator.getManipulator(getBattleArmor().getLeftManipulatorName());
             if (manipulator != null) {
                 leftManipulatorSelect.setSelectedItem(BattleArmor.MANIPULATOR_NAME_STRINGS[manipulator.type]);
             }
 
-            manipulator = TestBattleArmor.BAManipulator.getManipulator(getBattleArmor().getRightManipulatorName());
+            manipulator = BAManipulator.getManipulator(getBattleArmor().getRightManipulatorName());
             if (manipulator != null) {
                 rightManipulatorSelect.setSelectedItem(BattleArmor.MANIPULATOR_NAME_STRINGS[manipulator.type]);
                 rightManipulatorSelect.setEnabled(!manipulator.pairMounted);
-                refreshCargoLifterSize();
+                Mounted<?> leftManipulator = getBattleArmor().getLeftManipulator();
+                if (leftManipulator != null && leftManipulator.is(EquipmentTypeLookup.BA_MANIPULATOR_CARGO_LIFTER)) {
+                    cargoLifterCapacityModel.setValue(leftManipulator.getSize());
+                    cargoLifterCapacity.setVisible(true);
+                } else {
+                    cargoLifterCapacity.setVisible(false);
+                }
                 lblSize.setVisible(cargoLifterCapacity.isVisible());
             }
 
@@ -207,24 +216,34 @@ public class BAManipulatorView extends IView {
         }
     }
 
+    /**
+     * Eventhandler for selecting a manipulator in one of the two dropdowns
+     *
+     * @param event the Swing event
+     */
     public void manipulatorSelected(ActionEvent event) {
         if (ignoreEvents) {
             return;
         }
         int location = event.getSource() == leftManipulatorSelect ? MOUNT_LOC_LEFT_ARM : MOUNT_LOC_RIGHT_ARM;
         String name = (String) ((JComboBox<?>) event.getSource()).getSelectedItem();
-        TestBattleArmor.BAManipulator testManipulatorItem = TestBattleArmor.BAManipulator.getManipulator(name);
-        if (testManipulatorItem == null) {
+        BAManipulator manipulatorItem = BAManipulator.getManipulator(name);
+        if (manipulatorItem == null) {
             throw new IllegalStateException(COMBO_ERROR.formatted(name));
         }
-        var currentManipulator = getManipulator(location);
+        MiscMounted currentManipulator = getBattleArmor().getManipulator(location);
         // only react if the manipulator has actually changed
-        if (currentManipulator.isEmpty() || !currentManipulator.get().is(testManipulatorItem.internalName)) {
-            setManipulators(testManipulatorItem, location);
+        if (currentManipulator == null || !currentManipulator.is(manipulatorItem.internalName)) {
+            setManipulators(manipulatorItem, location);
             doRefresh();
         }
     }
 
+    /**
+     * Eventhandler for (de)selecting one of the two Modular Equipment Adaptors
+     *
+     * @param event the Swing event
+     */
     public void modularSelected(ActionEvent event) {
         if (ignoreEvents) {
             return;
@@ -267,25 +286,18 @@ public class BAManipulatorView extends IView {
         ignoreEvents = false;
     }
 
+    /**
+     * Eventhandler for changing the cargo lifter size value
+     *
+     * @param event the Swing event
+     */
     public void cargoSizeEdited(ChangeEvent event) {
         if (ignoreEvents) {
             return;
         }
-        setManipulatorSize(BattleArmor.MOUNT_LOC_LEFT_ARM, cargoLifterCapacityModel.getNumber().doubleValue());
-        setManipulatorSize(BattleArmor.MOUNT_LOC_RIGHT_ARM, cargoLifterCapacityModel.getNumber().doubleValue());
+        setManipulatorSize(MOUNT_LOC_LEFT_ARM, cargoLifterCapacityModel.getNumber().doubleValue());
+        setManipulatorSize(MOUNT_LOC_RIGHT_ARM, cargoLifterCapacityModel.getNumber().doubleValue());
         doRefresh();
-    }
-
-    private void refreshCargoLifterSize() {
-        Optional<MiscMounted> manipulator = getManipulator(BattleArmor.MOUNT_LOC_LEFT_ARM);
-        if (manipulator.isPresent() && manipulator.get().getType().isVariableSize()) {
-            cargoLifterCapacityModel.setValue(manipulator.get().getSize());
-            cargoLifterCapacityModel.setStepSize(manipulator.get().getType().variableStepSize());
-            cargoLifterCapacityModel.setMinimum(manipulator.get().getType().variableStepSize());
-            cargoLifterCapacity.setVisible(true);
-        } else {
-            cargoLifterCapacity.setVisible(false);
-        }
     }
 
     /**
@@ -295,11 +307,8 @@ public class BAManipulatorView extends IView {
      * @param newManipulator The new manipulator type
      * @param mountLoc       one of the two arm locations (MOUNT_LOC_x_ARM)
      */
-    private void setManipulators(TestBattleArmor.BAManipulator newManipulator, int mountLoc) {
+    private void setManipulators(BAManipulator newManipulator, int mountLoc) {
         MiscMounted currentManipulator = getBattleArmor().getManipulator(mountLoc);
-        if (currentManipulator != null) {
-            UnitUtil.removeMounted(getBattleArmor(), currentManipulator);
-        }
         setManipulator(newManipulator, mountLoc);
 
         if (newManipulator.pairMounted) {
@@ -309,7 +318,7 @@ public class BAManipulatorView extends IView {
             // when the previous manipulator was pair-mounted but the new one is not, remove the old on the other arm
             MiscMounted secondManipulator = getBattleArmor().getManipulator(otherArm(mountLoc));
             if (secondManipulator != null) {
-                UnitUtil.removeMounted(getBattleArmor(), currentManipulator);
+                UnitUtil.removeMounted(getBattleArmor(), secondManipulator);
             }
         }
     }
@@ -322,12 +331,14 @@ public class BAManipulatorView extends IView {
      * @param newManipulator The new manipulator type
      * @param mountLoc       one of the two arm locations (MOUNT_LOC_x_ARM)
      */
-    private void setManipulator(TestBattleArmor.BAManipulator newManipulator, int mountLoc) {
-        Optional<MiscMounted> currentManipulator = getManipulator(mountLoc);
-        currentManipulator.ifPresent(miscMounted -> UnitUtil.removeMounted(getBattleArmor(), miscMounted));
-        if (newManipulator != TestBattleArmor.BAManipulator.NONE) {
+    private void setManipulator(BAManipulator newManipulator, int mountLoc) {
+        MiscMounted currentManipulator = getBattleArmor().getManipulator(mountLoc);
+        if (currentManipulator != null) {
+            ConstructionUtil.removeMounted(getBattleArmor(), currentManipulator);
+        }
+        if (newManipulator != BAManipulator.NONE) {
             try {
-                Mounted<?> manipulator = getBattleArmor().addEquipment(newManipulator.getMiscMounted(),
+                Mounted<?> manipulator = getBattleArmor().addEquipment(newManipulator.miscType(),
                       BattleArmor.LOC_SQUAD);
                 manipulator.setBaMountLoc(mountLoc);
             } catch (LocationFullException ex) {
@@ -355,7 +366,7 @@ public class BAManipulatorView extends IView {
     }
 
     private boolean isPairedManipulator(EquipmentType eq) {
-        TestBattleArmor.BAManipulator manipulator = TestBattleArmor.BAManipulator.getManipulator(eq.getInternalName());
+        BAManipulator manipulator = BAManipulator.getManipulator(eq.getInternalName());
         return manipulator != null && manipulator.pairMounted;
     }
 
