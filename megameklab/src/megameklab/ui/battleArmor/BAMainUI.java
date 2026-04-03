@@ -148,7 +148,6 @@ public class BAMainUI extends MegaMekLabMainUI {
         refreshBuild();
         refreshPreview();
         refreshHeader();
-        refreshPreview();
     }
 
     @Override

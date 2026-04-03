@@ -73,8 +73,8 @@ public class BAManipulatorView extends IView {
 
     private static final MiscType MODULAR_MOUNT = (MiscType) EquipmentType.get(BA_MODULAR_EQUIPMENT_ADAPTOR);
 
-    private final JCheckBox leftModularSelector = new JCheckBox("Modular Equipment Adaptor");
-    private final JCheckBox rightModularSelector = new JCheckBox("Modular Equipment Adaptor");
+    private final JCheckBox leftModularSelector = new JCheckBox(I18N.getString("BAManipulatorView.mea"));
+    private final JCheckBox rightModularSelector = new JCheckBox(I18N.getString("BAManipulatorView.mea"));
 
     private final CustomComboBox<String> leftManipulatorSelect = new CustomComboBox<>(this::manipulatorDisplayName);
     private final CustomComboBox<String> rightManipulatorSelect = new CustomComboBox<>(this::manipulatorDisplayName);
@@ -252,7 +252,7 @@ public class BAManipulatorView extends IView {
         int location = event.getSource() == leftModularSelector ? MOUNT_LOC_LEFT_ARM : MOUNT_LOC_RIGHT_ARM;
 
         if (modularCheckBox.isSelected()) {
-            if (getBattleArmor().hasMisc(BA_MODULAR_EQUIPMENT_ADAPTOR, location)) {
+            if (getBattleArmor().hasMiscInMountLocation(BA_MODULAR_EQUIPMENT_ADAPTOR, location)) {
                 // equipment is already there, no action needed
                 return;
             }
@@ -280,7 +280,7 @@ public class BAManipulatorView extends IView {
 
     private void handleNoRoomForModularMount(JCheckBox checkBox) {
         JOptionPane.showMessageDialog(SwingUtilities.windowForComponent(this),
-              "Not enough room to add a Modular Equipment Adaptor!");
+              I18N.getString("BAManipulatorView.meaCannotAdd"));
         ignoreEvents = true;
         checkBox.setSelected(false);
         ignoreEvents = false;
