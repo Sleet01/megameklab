@@ -229,10 +229,6 @@ public class MegaMekLab {
 
         updateGuiScaling(); // also sets the look-and-feel
 
-        // Show licensing/welcome dialog
-        LicensingDialog.showIfNeeded(null,
-              "Welcome to MegaMekLab " + MMLConstants.VERSION);
-
         if (args.length >= 1) {
             String name = args[0];
             if (openUnitFile(name, noStartup)) {
@@ -258,6 +254,12 @@ public class MegaMekLab {
             }
             case RESTORE_TABS -> UiLoader.restoreTabbedUi();
             default -> StartupGUI.getInstance().setVisible(true);
+        }
+
+        // Show licensing/welcome dialog after startup screen is visible
+        if (!noStartup) {
+            LicensingDialog.showIfNeeded(null,
+                  "Welcome to " + MMLConstants.PROJECT_NAME + " " + MMLConstants.VERSION);
         }
     }
 

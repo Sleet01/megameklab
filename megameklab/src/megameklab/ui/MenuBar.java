@@ -51,6 +51,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.clientGUI.GUIPreferences;
+import megamek.client.ui.dialogs.LicensingDialog;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.abstractDialogs.BVDisplayDialog;
 import megamek.client.ui.dialogs.abstractDialogs.CostDisplayDialog;
@@ -1282,13 +1283,7 @@ public class MenuBar extends JMenuBar implements ClipboardOwner {
         body.setAlignmentX(Component.CENTER_ALIGNMENT);
         body.addHyperlinkListener(e -> {
             if (e.getEventType() == javax.swing.event.HyperlinkEvent.EventType.ACTIVATED) {
-                if (java.awt.Desktop.isDesktopSupported()) {
-                    try {
-                        java.awt.Desktop.getDesktop().browse(e.getURL().toURI());
-                    } catch (Exception ex) {
-                        logger.error(ex, "Could not open link: {}", e.getURL());
-                    }
-                }
+                UIUtil.browse(e.getURL().toString(), owner.getFrame());
             }
         });
 
@@ -1306,23 +1301,8 @@ public class MenuBar extends JMenuBar implements ClipboardOwner {
     }
 
     private static String buildAboutHtml() {
-        int width = UIUtil.scaleForGUI(500);
-        String wikiUrl = Messages.getString("LicensingDialog.wikiUrl");
-        String gameContentRulesUrl = Messages.getString("LicensingDialog.gameContentRulesUrl");
-        String gameContentRulesText = Messages.getString("LicensingDialog.gameContentRulesText");
-        String discordUrl = Messages.getString("LicensingDialog.discordUrl");
-        String discordText = Messages.getString("LicensingDialog.discordText");
-
-        return "<html><body width='" + width + "'>"
-              + "<p>" + Messages.getString("LicensingDialog.disclaimer") + "</p>"
-              + "<p>" + Messages.getString("LicensingDialog.licensing")
-              + " <a href=\"" + gameContentRulesUrl + "\">" + gameContentRulesText + "</a>.</p>"
-              + "<p>" + Messages.getString("LicensingDialog.wiki")
-              + " <a href=\"" + wikiUrl + "\">" + wikiUrl + "</a></p>"
-              + "<p>" + Messages.getString("CommonAboutDialog.community")
-              + " <a href=\"" + discordUrl + "\">" + discordText + "</a>.</p>"
-              + "<p><small><i>" + Messages.getString("LicensingDialog.trademark")
-              + "</i></small></p>"
+        return "<html><body width='" + UIUtil.scaleForGUI(500) + "'>"
+              + LicensingDialog.buildLegalHtml()
               + "</body></html>";
     }
 
