@@ -59,6 +59,7 @@ import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
+import megamek.common.units.BaConstructionUtil;
 import megamek.common.verifier.TestBattleArmor;
 import megamek.common.weapons.Weapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
@@ -486,7 +487,7 @@ public class BABuildView extends IView implements ActionListener, MouseListener 
                     String locName = BattleArmor.MOUNT_LOC_NAMES[misc.getBaMountLoc()];
                     item = new JMenuItem("Mount in " + misc.getName() + " (" + locName + ")");
                     item.addActionListener(evt -> {
-                        BattleArmorUtil.mountOnApm(eq, misc);
+                        BaConstructionUtil.mountOnApm(eq, misc);
                         ((BABuildTab) getParent().getParent()).refreshAll();
                     });
                     popup.add(item);
