@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMekLab.
  *
@@ -49,6 +49,7 @@ import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import megamek.client.ui.Messages;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.abstractDialogs.BVDisplayDialog;
@@ -1262,23 +1263,23 @@ public class MenuBar extends JMenuBar implements ClipboardOwner {
 
     // Show data about MegaMekLab
     private void aboutAction() {
-        // make the dialog
         JDialog dlg = new JDialog(owner.getFrame(), resources.getString("menu.help.about.title"));
 
-        // set up the contents
         JPanel child = new JPanel();
         child.setLayout(new BoxLayout(child, BoxLayout.Y_AXIS));
         child.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // set the text up.
         JLabel version = new JLabel(String.format(resources.getString("menu.help.about.version.format"),
               MMLConstants.VERSION));
+        version.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         JEditorPane body = new JEditorPane();
         body.setContentType("text/html");
         body.setEditable(false);
         body.setOpaque(false);
-        body.setText(resources.getString("menu.help.about.text"));
-
+        body.setText(buildAboutHtml());
+        body.setCaretPosition(0);
+        body.setAlignmentX(Component.CENTER_ALIGNMENT);
         body.addHyperlinkListener(e -> {
             if (e.getEventType() == javax.swing.event.HyperlinkEvent.EventType.ACTIVATED) {
                 if (java.awt.Desktop.isDesktopSupported()) {
@@ -1291,23 +1292,38 @@ public class MenuBar extends JMenuBar implements ClipboardOwner {
             }
         });
 
-        // center everything
-        version.setAlignmentX(Component.CENTER_ALIGNMENT);
-        body.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // add to child panel
         child.add(new JLabel("\n"));
         child.add(version);
         child.add(new JLabel("\n"));
         child.add(body);
 
-        // then add child panel to the content pane.
         dlg.getContentPane().add(child);
         dlg.setLocationRelativeTo(owner.getFrame());
         dlg.setModal(true);
         dlg.setResizable(false);
         dlg.pack();
         dlg.setVisible(true);
+    }
+
+    private static String buildAboutHtml() {
+        int width = UIUtil.scaleForGUI(500);
+        String wikiUrl = Messages.getString("LicensingDialog.wikiUrl");
+        String gameContentRulesUrl = Messages.getString("LicensingDialog.gameContentRulesUrl");
+        String gameContentRulesText = Messages.getString("LicensingDialog.gameContentRulesText");
+        String discordUrl = Messages.getString("LicensingDialog.discordUrl");
+        String discordText = Messages.getString("LicensingDialog.discordText");
+
+        return "<html><body width='" + width + "'>"
+              + "<p>" + Messages.getString("LicensingDialog.disclaimer") + "</p>"
+              + "<p>" + Messages.getString("LicensingDialog.licensing")
+              + " <a href=\"" + gameContentRulesUrl + "\">" + gameContentRulesText + "</a>.</p>"
+              + "<p>" + Messages.getString("LicensingDialog.wiki")
+              + " <a href=\"" + wikiUrl + "\">" + wikiUrl + "</a></p>"
+              + "<p>" + Messages.getString("CommonAboutDialog.community")
+              + " <a href=\"" + discordUrl + "\">" + discordText + "</a>.</p>"
+              + "<p><small><i>" + Messages.getString("LicensingDialog.trademark")
+              + "</i></small></p>"
+              + "</body></html>";
     }
 
     // Show how to create fluff images for Record Sheets
