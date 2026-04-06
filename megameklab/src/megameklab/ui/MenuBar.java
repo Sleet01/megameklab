@@ -728,9 +728,7 @@ public class MenuBar extends JMenuBar implements ClipboardOwner {
         MekSummaryCache mekSummaryCache = MekSummaryCache.getInstance();
         UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(owner.getFrame(), mekSummaryCache,
               resources.getString("miRefreshUnitCache.text"), !mekSummaryCache.isLoading());
-        if (!mekSummaryCache.isLoading()) {
-            MekSummaryCache.refreshUnitData(false);
-        }
+        MekSummaryCache.refreshUnitData(false);
         unitLoadingDialog.setVisible(true);
     }
 
@@ -738,9 +736,7 @@ public class MenuBar extends JMenuBar implements ClipboardOwner {
         MekSummaryCache mekSummaryCache = MekSummaryCache.getInstance();
         UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(owner.getFrame(), mekSummaryCache,
               resources.getString("miRebuildUnitCache.text"), !mekSummaryCache.isLoading());
-        if (!mekSummaryCache.isLoading()) {
-            MekSummaryCache.rebuildUnitData(false);
-        }
+        MekSummaryCache.rebuildUnitData(false);
         unitLoadingDialog.setVisible(true);
     }
 
