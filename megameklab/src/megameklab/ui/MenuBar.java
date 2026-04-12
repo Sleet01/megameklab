@@ -713,10 +713,31 @@ public class MenuBar extends JMenuBar implements ClipboardOwner {
         final JMenuItem miRefreshUnitCache = new JMenuItem(resources.getString("miRefreshUnitCache.text"));
         miRefreshUnitCache.setName("miRefreshUnitCache");
         miRefreshUnitCache.setMnemonic(KeyEvent.VK_U);
-        miRefreshUnitCache.addActionListener(evt -> MekSummaryCache.refreshUnitData(false));
+        miRefreshUnitCache.addActionListener(evt -> refreshUnitCache());
         refreshMenu.add(miRefreshUnitCache);
 
+        final JMenuItem miRebuildUnitCache = new JMenuItem(resources.getString("miRebuildUnitCache.text"));
+        miRebuildUnitCache.setName("miRebuildUnitCache");
+        miRebuildUnitCache.addActionListener(evt -> rebuildUnitCache());
+        refreshMenu.add(miRebuildUnitCache);
+
         return refreshMenu;
+    }
+
+    private void refreshUnitCache() {
+        MekSummaryCache mekSummaryCache = MekSummaryCache.getInstance();
+        UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(owner.getFrame(), mekSummaryCache,
+              resources.getString("miRefreshUnitCache.text"), !mekSummaryCache.isLoading());
+        MekSummaryCache.refreshUnitData(false);
+        unitLoadingDialog.setVisible(true);
+    }
+
+    private void rebuildUnitCache() {
+        MekSummaryCache mekSummaryCache = MekSummaryCache.getInstance();
+        UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(owner.getFrame(), mekSummaryCache,
+              resources.getString("miRebuildUnitCache.text"), !mekSummaryCache.isLoading());
+        MekSummaryCache.rebuildUnitData(false);
+        unitLoadingDialog.setVisible(true);
     }
 
     /**
