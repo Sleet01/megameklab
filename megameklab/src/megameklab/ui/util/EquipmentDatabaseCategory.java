@@ -148,7 +148,7 @@ public enum EquipmentDatabaseCategory {
 
     TORPEDO("Torpedoes",
           (eq, en) -> (eq instanceof WeaponType weaponType)
-                && weaponType.getAmmoType().isTorpedo(),
+                && weaponType.getAmmoType() != null && weaponType.getAmmoType().isTorpedo(),
           e -> !(e instanceof BattleArmor) && !(e instanceof Aero)),
 
     UNAVAILABLE("Unavailable"),
