@@ -340,7 +340,7 @@ public class EquipmentTableModel extends AbstractTableModel {
                     return ((InfantryWeapon) weaponType).getInfantryRange() + "";
                 }
                 if (weaponType.getAmmoType() != null && weaponType.getAmmoType().isTorpedo()) {
-                    return "[W] " + weaponType.getWShortRange() + "/" + weaponType.getWMediumRange()
+                    return weaponType.getWShortRange() + "/" + weaponType.getWMediumRange()
                           + "/" + weaponType.getWLongRange();
                 }
                 return weaponType.getShortRange() + "/" + weaponType.getMediumRange()
