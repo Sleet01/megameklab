@@ -50,7 +50,6 @@ import java.util.function.Function;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.EquipmentType;
-import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.equipment.GunEmplacement;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.WeaponType;
@@ -84,7 +83,8 @@ public enum EquipmentDatabaseCategory {
           (eq, en) -> (eq instanceof WeaponType) && !((WeaponType) eq).isCapital() && eq.hasFlag(F_BALLISTIC)),
 
     MISSILE("Missile",
-          (eq, en) -> (eq instanceof WeaponType) && !((WeaponType) eq).isCapital() && eq.hasFlag(F_MISSILE)),
+          (eq, en) -> ((eq instanceof WeaponType) && !((WeaponType) eq).isCapital() && eq.hasFlag(F_MISSILE))
+                || eq.is("Screen Launcher")),
 
     ARTILLERY("Artillery",
           (eq, en) -> (eq instanceof WeaponType) && eq.hasFlag(F_ARTILLERY),
@@ -132,7 +132,8 @@ public enum EquipmentDatabaseCategory {
                 || eq.is(COOLANT_POD)
                 || eq.is(BattleArmor.MINE_LAUNCHER)
                 || (eq instanceof TAGWeapon)
-                || (eq instanceof WeaponType && eq.hasFlag(F_AMS))),
+                || (eq instanceof WeaponType && eq.hasFlag(F_AMS))
+                || eq.is("Screen Launcher")),
 
     AP("Anti-Personnel",
           (eq, en) -> BattleArmorUtil.isBattleArmorAPWeapon(eq),
