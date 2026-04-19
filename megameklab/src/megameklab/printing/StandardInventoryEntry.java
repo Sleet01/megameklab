@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMekLab.
  *
@@ -192,8 +192,7 @@ public class StandardInventoryEntry implements InventoryEntry, Comparable<Standa
                 if (weaponType.getMinimumRange() > 0) {
                     r[RangeType.RANGE_MINIMUM] = CConfig.formatScale(weaponType.getMinimumRange(), false);
                 }
-                if ((weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.LRM_TORPEDO)
-                      || (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.SRM_TORPEDO)) {
+                if (weaponType.getAmmoType() != null && weaponType.getAmmoType().isTorpedo()) {
                     r[RangeType.RANGE_SHORT] = CConfig.formatScale(weaponType.getWShortRange(), false);
                     if (weaponType.getWMediumRange() > weaponType.getWShortRange()) {
                         r[RangeType.RANGE_MEDIUM] = CConfig.formatScale(weaponType.getWMediumRange(), false);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMekLab.
  *
@@ -338,6 +338,10 @@ public class EquipmentTableModel extends AbstractTableModel {
                 }
                 if (weaponType instanceof InfantryWeapon) {
                     return ((InfantryWeapon) weaponType).getInfantryRange() + "";
+                }
+                if (weaponType.getAmmoType() != null && weaponType.getAmmoType().isTorpedo()) {
+                    return weaponType.getWShortRange() + "/" + weaponType.getWMediumRange()
+                          + "/" + weaponType.getWLongRange();
                 }
                 return weaponType.getShortRange() + "/" + weaponType.getMediumRange()
                       + "/" + weaponType.getLongRange();
