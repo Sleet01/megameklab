@@ -32,7 +32,6 @@
  */
 package megameklab;
 
-import java.awt.Color;
 import java.awt.Window;
 import java.io.File;
 import java.io.ObjectInputFilter;
@@ -155,9 +154,6 @@ public class MegaMekLab {
             final String title = String.format(MMLoggingConstants.UNHANDLED_EXCEPTION_TITLE, name);
             LOGGER.errorDialog(t, message, title);
         });
-
-        // Set an alternate table row color; it uses alpha and is valid for both dark and light UIs
-        UIManager.put("Table.alternateRowColor", new Color(125, 125, 125, 50));
 
         MegaMek.initializeLogging(MMLConstants.PROJECT_NAME);
         MegaMekLab.initializeLogging(MMLConstants.PROJECT_NAME);
