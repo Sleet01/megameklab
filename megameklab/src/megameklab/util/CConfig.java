@@ -588,8 +588,8 @@ public final class CConfig {
             int sizeX = Integer.parseInt(values[2]);
             int sizeY = Integer.parseInt(values[3]);
             Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-            int clampedWidth = Math.clamp(screen.width, 50, sizeX); // 50 minimum width
-            int clampedHeight = Math.clamp(screen.height, 50, sizeY); // 50 minimum height
+            int clampedWidth = Math.clamp(sizeX, 50, screen.width); // 50 minimum width
+            int clampedHeight = Math.clamp(sizeY, 50, screen.height); // 50 minimum height
             return Optional.of(new Dimension(clampedWidth, clampedHeight));
         } catch (Exception e) {
             return Optional.empty();
