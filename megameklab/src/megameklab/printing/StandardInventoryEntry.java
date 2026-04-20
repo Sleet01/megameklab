@@ -315,8 +315,7 @@ public class StandardInventoryEntry implements InventoryEntry, Comparable<Standa
         if (mount instanceof WeaponMounted && mount.getEntity().isBattleArmor()) {
             if (mount.getBaMountLoc() == BattleArmor.MOUNT_LOC_BODY) {
                 name.append(" (Body)");
-            } else
-            if (!mount.isMekTurretMounted() && mount.getBaMountLoc() == BattleArmor.MOUNT_LOC_TURRET) {
+            } else if (!mount.isMekTurretMounted() && mount.getBaMountLoc() == BattleArmor.MOUNT_LOC_TURRET) {
                 name.append(" (T)");
             }
         }
@@ -421,10 +420,11 @@ public class StandardInventoryEntry implements InventoryEntry, Comparable<Standa
      *
      * @return The abbreviated location string
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     private String formatMekLocations(List<Integer> locations) {
         if (locations.stream().allMatch(l -> mount.getEntity().locationIsLeg(l))) {
             if ((mount.getEntity().entityIsQuad() && (locations.size() == 4))
-                   || ((mount.getEntity() instanceof TripodMek) && (locations.size() == 3))) {
+                  || ((mount.getEntity() instanceof TripodMek) && (locations.size() == 3))) {
                 return "Legs";
             }
         } else if (locations.stream().allMatch(l -> ((Mek) mount.getEntity()).locationIsTorso(l))) {
