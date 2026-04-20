@@ -49,6 +49,7 @@ import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import megamek.client.ui.CopySystemDataAction;
 import megamek.client.ui.clientGUI.BugReportDialog;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
@@ -1145,18 +1146,11 @@ public class MenuBar extends JMenuBar implements ClipboardOwner {
 
         JMenuItem menuBugReportItem = new JMenuItem(resources.getString("menuReportBug.text"));
         menuBugReportItem.setName("ReportBug");
-        menuBugReportItem.addActionListener(evt -> new BugReportDialog(owner.getFrame()).show());
+        menuBugReportItem.addActionListener(evt -> new BugReportDialog(owner.getFrame(),
+              new CopySystemDataAction(MMLConstants.PROJECT_NAME)).show());
         helpMenu.add(menuBugReportItem);
 
-        JMenuItem menuCopySystemDataItem = new JMenuItem(resources.getString("menuCopySystemData.text"));
-        menuCopySystemDataItem.setName("CopySystemData");
-        menuCopySystemDataItem.setToolTipText(resources.getString("menuCopySystemData.tip"));
-        menuCopySystemDataItem.addActionListener(evt -> {
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            clipboard.setContents(new StringSelection(
-                  MegaMekLab.getUnderlyingInformation(MMLConstants.PROJECT_NAME)), null);
-        });
-        helpMenu.add(menuCopySystemDataItem);
+        helpMenu.add(new CopySystemDataAction(MMLConstants.PROJECT_NAME));
 
         helpMenu.add(new JSeparator());
 
