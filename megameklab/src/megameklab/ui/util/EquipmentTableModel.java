@@ -469,32 +469,38 @@ public class EquipmentTableModel extends AbstractTableModel {
                   + weaponType.getDamage(weaponType.getMediumRange()) + "/"
                   + weaponType.getDamage(weaponType.getLongRange());
         } else if (weaponType.getDamage() == WeaponType.DAMAGE_BY_CLUSTER_TABLE) {
-            if (weaponType instanceof HAGWeapon) {
-                return weaponType.getRackSize() + "";
-            } else if (weaponType instanceof MekMortarWeapon) {
-                return "Special";
-            } else if (weaponType instanceof MissileWeapon) {
-                int dmg;
-                if (weaponType instanceof ThunderboltWeapon) {
-                    return switch (weaponType.getAmmoType()) {
-                        case TBOLT_5 -> "5";
-                        case TBOLT_10 -> "10";
-                        case TBOLT_15 -> "15";
-                        case TBOLT_20 -> "20";
-                        default -> "0";
-                    };
-                } else if ((weaponType instanceof ATMWeapon)
-                      || (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.SRM)
-                      || (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.SRM_STREAK)
-                      || (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.SRM_ADVANCED)
-                      || (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.SRM_IMP)
-                      || (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.SRM_PRIMITIVE)
-                      || (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.SRM_TORPEDO)) {
-                    dmg = 2;
-                } else {
-                    dmg = 1;
+            switch (weaponType) {
+                case HAGWeapon ignored -> {
+                    return weaponType.getRackSize() + "";
                 }
-                return dmg + "/msl";
+                case MekMortarWeapon ignored -> {
+                    return "Special";
+                }
+                case MissileWeapon ignored -> {
+                    int dmg;
+                    if (weaponType instanceof ThunderboltWeapon) {
+                        return switch (weaponType.getAmmoType()) {
+                            case TBOLT_5 -> "5";
+                            case TBOLT_10 -> "10";
+                            case TBOLT_15 -> "15";
+                            case TBOLT_20 -> "20";
+                            default -> "0";
+                        };
+                    } else if ((weaponType instanceof ATMWeapon)
+                          || (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.SRM)
+                          || (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.SRM_STREAK)
+                          || (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.SRM_ADVANCED)
+                          || (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.SRM_IMP)
+                          || (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.SRM_PRIMITIVE)
+                          || (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.SRM_TORPEDO)) {
+                        dmg = 2;
+                    } else {
+                        dmg = 1;
+                    }
+                    return dmg + "/msl";
+                }
+                default -> {
+                }
             }
             return "Cluster";
         } else if (weaponType.getDamage() == WeaponType.DAMAGE_ARTILLERY) {
