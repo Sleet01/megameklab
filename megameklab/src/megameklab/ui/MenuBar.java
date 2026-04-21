@@ -75,7 +75,6 @@ import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import megameklab.MMLConstants;
-import megameklab.MegaMekLab;
 import megameklab.ui.dialog.MMLFileChooser;
 import megameklab.ui.dialog.MegaMekLabUnitSelectorDialog;
 import megameklab.ui.dialog.PrintQueueDialog;
