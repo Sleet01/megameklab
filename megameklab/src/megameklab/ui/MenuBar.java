@@ -50,7 +50,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import megamek.client.ui.CopySystemDataAction;
-import megamek.client.ui.clientGUI.BugReportDialog;
+import megamek.client.ui.ShowBugReportDialogAction;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.abstractDialogs.BVDisplayDialog;
@@ -1140,7 +1140,7 @@ public class MenuBar extends JMenuBar implements ClipboardOwner {
         miResetWindowPos.addActionListener(evt -> CConfig.resetWindowPositions());
         helpMenu.add(miResetWindowPos);
 
-        // On Mac, the About... dialog can also be called from the auto-added MegaMekLab menu item
+        // On Mac, handle the auto-added MegaMekLab menu items
         Desktop desktop = Desktop.getDesktop();
         if (desktop.isSupported(Desktop.Action.APP_ABOUT)) {
             desktop.setAboutHandler(ev -> aboutAction());
@@ -1162,17 +1162,13 @@ public class MenuBar extends JMenuBar implements ClipboardOwner {
         miRecordSheetImages.addActionListener(evt -> recordSheetImagesAction());
         helpMenu.add(miRecordSheetImages);
 
-        helpMenu.add(new JSeparator());
+        helpMenu.addSeparator();
 
-        JMenuItem menuBugReportItem = new JMenuItem(resources.getString("menuReportBug.text"));
-        menuBugReportItem.setName("ReportBug");
-        menuBugReportItem.addActionListener(evt -> new BugReportDialog(owner.getFrame(),
-              new CopySystemDataAction(MMLConstants.PROJECT_NAME)).show());
-        helpMenu.add(menuBugReportItem);
+        CopySystemDataAction copySystemDataAction = new CopySystemDataAction(MMLConstants.PROJECT_NAME);
+        helpMenu.add(new ShowBugReportDialogAction(owner.getFrame(), copySystemDataAction));
+        helpMenu.add(copySystemDataAction);
 
-        helpMenu.add(new CopySystemDataAction(MMLConstants.PROJECT_NAME));
-
-        helpMenu.add(new JSeparator());
+        helpMenu.addSeparator();
 
         final JMenuItem miAbout = new JMenuItem(resources.getString("miAbout.text"));
         miAbout.setName("miAbout");
