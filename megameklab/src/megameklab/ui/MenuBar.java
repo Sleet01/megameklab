@@ -1141,19 +1141,21 @@ public class MenuBar extends JMenuBar implements ClipboardOwner {
         helpMenu.add(miResetWindowPos);
 
         // On Mac, handle the auto-added MegaMekLab menu items
-        Desktop desktop = Desktop.getDesktop();
-        if (desktop.isSupported(Desktop.Action.APP_ABOUT)) {
-            desktop.setAboutHandler(ev -> aboutAction());
-        }
-        if (desktop.isSupported(Desktop.Action.APP_QUIT_HANDLER)) {
-            desktop.setQuitHandler((e, response) -> {
-                boolean canQuit = owner.exit();
-                if (canQuit) {
-                    response.performQuit();
-                } else {
-                    response.cancelQuit();
-                }
-            });
+        if (Desktop.isDesktopSupported()) {
+            Desktop desktop = Desktop.getDesktop();
+            if (desktop.isSupported(Desktop.Action.APP_ABOUT)) {
+                desktop.setAboutHandler(ev -> aboutAction());
+            }
+            if (desktop.isSupported(Desktop.Action.APP_QUIT_HANDLER)) {
+                desktop.setQuitHandler((e, response) -> {
+                    boolean canQuit = owner.exit();
+                    if (canQuit) {
+                        response.performQuit();
+                    } else {
+                        response.cancelQuit();
+                    }
+                });
+            }
         }
 
         final JMenuItem miRecordSheetImages = new JMenuItem(resources.getString("miRecordSheetImages.text"));
