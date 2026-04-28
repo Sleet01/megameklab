@@ -40,7 +40,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -436,7 +435,7 @@ public class BasicInfoView extends BuildView implements ITechManager, ActionList
         } else {
             txtSource.setToolTipText("<html>%s</html>".formatted(String.join("<hr>", sourceTooltips)));
         }
-        sourceMulLinkButton.setEnabled(!sourceBooks.loadSourceBooks(sourceAbbreviation).isEmpty());
+        sourceMulLinkButton.setEnabled(shouldShowSourcebookMULButton());
         listeners.forEach(l -> l.sourceChanged(sourceAbbreviation));
     }
 
@@ -688,8 +687,27 @@ public class BasicInfoView extends BuildView implements ITechManager, ActionList
      * @return true when the "Open MUL in Browser" Button can be used
      */
     private boolean shouldShowMULButton() {
-        return (txtMulId.getIntVal(-1) > 0) && Desktop.isDesktopSupported()
-              && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
+        return (txtMulId.getIntVal(-1) > 0) && canBrowseDesktop();
+    }
+
+    /**
+     * The sourcebook MUL button should be shown when any selected sourcebook has a MUL URL and the system seems to
+     * support calling a standard browser.
+     *
+     * @return true when the "Open Sourcebook MUL in Browser" Button can be used
+     */
+    private boolean shouldShowSourcebookMULButton() {
+        return canBrowseDesktop() && sourceBooks.loadSourceBooks(sourceAbbreviation)
+              .stream()
+              .anyMatch(sourceBook -> (sourceBook.getMul_url() != null) && !sourceBook.getMul_url().isBlank());
+    }
+
+    private boolean canBrowseDesktop() {
+        try {
+            return Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
+        } catch (RuntimeException ex) {
+            return false;
+        }
     }
 
     /**
@@ -715,7 +733,7 @@ public class BasicInfoView extends BuildView implements ITechManager, ActionList
                 if ((sourceBook.getMul_url() != null) && !sourceBook.getMul_url().isBlank()) {
                     Desktop.getDesktop().browse(URI.create(sourceBook.getMul_url()));
                 }
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 LOGGER.error("", ex);
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
             }
