@@ -1822,9 +1822,8 @@ public class SVGMassPrinter {
      *
      * @param args the raw command-line arguments
      *
-     * @return {@code true} if processing should continue, {@code false} if the program should exit (e.g. on
-     *       {@code --help} or an invalid argument)
-     */
+     * @return {@code true} if processing should continue, {@code false} if an invalid argument was encountered.
+     *       Note: {@code --help} prints usage and exits the JVM with code 0.
     private static boolean parseArgs(String[] args) {
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
