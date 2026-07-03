@@ -443,7 +443,7 @@ public class SVGMassPrinter {
                 }
                 entry.c = getCriticals(entity, type);
                 if ((entity instanceof ConvInfantry infantry) && (locId == ConvInfantry.LOC_FIELD_GUNS)) {
-                    entry.cw = (int) Math.ceil(type.getTonnage(infantry));
+                    entry.cw = Math.max(2, (int) Math.ceil(type.getTonnage(infantry)));
                 }
                 list.put(key, entry);
                 return entry;
