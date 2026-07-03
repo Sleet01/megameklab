@@ -193,6 +193,7 @@ public class SVGMassPrinter {
         public String d; // Damage type, if applicable
         public String md; // Max Damage, if applicable
         public String c; // Critical slots
+        public Integer cw; // Crew required to man this equipment, if applicable
         public int os; // If is an oneshot weapon or a double oneshot weapon (1 or 2), if applicable
         public Collection<ExportInventoryEntry> bay; // Bay weapons, if applicable
     }
@@ -447,6 +448,9 @@ public class SVGMassPrinter {
                     entry.os = 1; // If the weapon is oneshot
                 }
                 entry.c = getCriticals(entity, type);
+                if ((entity instanceof ConvInfantry infantry) && (locId == ConvInfantry.LOC_FIELD_GUNS)) {
+                    entry.cw = Math.max(2, (int) Math.ceil(type.getTonnage(infantry)));
+                }
                 list.put(key, entry);
                 return entry;
             }
@@ -1166,8 +1170,12 @@ public class SVGMassPrinter {
             this.techRating = entity.getFullRatingName();
             this.level = formatRulesLevel(entity, options);
             if (entity.hasEngine() && !(entity instanceof SmallCraft || entity instanceof Jumpship)) {
-                this.engineRating = entity.getEngine().getRating();
-                this.engine = Engine.getEngineTypeName(entity.getEngine().getEngineType()).trim();
+                Engine unitEngine = entity.getEngine();
+                this.engineRating = unitEngine.getRating();
+                this.engine = Engine.getEngineTypeName(unitEngine.getEngineType()).trim();
+                if (this.engine.equals("XL") || this.engine.equals("XXL")) {
+                    this.engine+=(unitEngine.isClan() ? " (Clan)" : " (IS)");
+                }
             }
             // This is over-convoluted for no reason, should be simplified and unified at the source
             final String majorType = Entity.getEntityMajorTypeName(entity.getEntityType());
