@@ -51,6 +51,7 @@ import megameklab.ui.MegaMekLabMainUI;
 import megameklab.ui.dialog.FloatingEquipmentDatabaseDialog;
 import megameklab.ui.generalUnit.AbstractEquipmentTab;
 import megameklab.ui.generalUnit.FluffTab;
+import megameklab.ui.generalUnit.AnalysisTab;
 import megameklab.ui.generalUnit.PreviewTab;
 import megameklab.ui.generalUnit.QuirksTab;
 import megameklab.ui.generalUnit.TransportTab;
@@ -66,6 +67,7 @@ public class SVMainUI extends MegaMekLabMainUI {
     private AbstractEquipmentTab equipmentTab;
     private TransportTab transportTab;
     private PreviewTab previewTab;
+    private AnalysisTab analysisTab;
     private SVBuildTab buildTab;
     private FluffTab fluffTab;
     private SVStatusBar statusbar;
@@ -111,6 +113,7 @@ public class SVMainUI extends MegaMekLabMainUI {
         statusbar.addRefreshedListener(this);
 
         previewTab = new PreviewTab(this);
+        analysisTab = new AnalysisTab(this);
 
         configPane.addTab("Structure", new TabScrollPane(structureTab));
         configPane.addTab("Armor", new TabScrollPane(armorTab));
@@ -120,6 +123,7 @@ public class SVMainUI extends MegaMekLabMainUI {
         configPane.addTab("Fluff", new TabScrollPane(fluffTab));
         configPane.addTab("Quirks", new TabScrollPane(quirksTab, quirksTab.refreshOnShow));
         configPane.addTab("Preview", previewTab);
+        configPane.addTab("Analysis", analysisTab);
 
         add(configPane, BorderLayout.CENTER);
         add(statusbar, BorderLayout.SOUTH);
@@ -147,6 +151,7 @@ public class SVMainUI extends MegaMekLabMainUI {
         quirksTab.refresh();
         fluffTab.refresh();
         previewTab.refresh();
+        analysisTab.refresh();
         floatingEquipmentDatabase.refresh();
         refreshHeader();
     }
@@ -256,6 +261,7 @@ public class SVMainUI extends MegaMekLabMainUI {
     public void refreshPreview() {
         super.refreshPreview();
         previewTab.refresh();
+        analysisTab.refresh();
     }
 
     @Override

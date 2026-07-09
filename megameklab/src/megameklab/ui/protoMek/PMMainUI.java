@@ -49,6 +49,7 @@ import megameklab.ui.MegaMekLabMainUI;
 import megameklab.ui.dialog.FloatingEquipmentDatabaseDialog;
 import megameklab.ui.generalUnit.AbstractEquipmentTab;
 import megameklab.ui.generalUnit.FluffTab;
+import megameklab.ui.generalUnit.AnalysisTab;
 import megameklab.ui.generalUnit.PreviewTab;
 import megameklab.ui.generalUnit.QuirksTab;
 import megameklab.ui.util.TabScrollPane;
@@ -63,6 +64,7 @@ public class PMMainUI extends MegaMekLabMainUI {
     private PMStructureTab structureTab;
     private AbstractEquipmentTab equipmentTab;
     private PreviewTab previewTab;
+    private AnalysisTab analysisTab;
     private PMBuildTab buildTab;
     private PMStatusBar statusbar;
     private QuirksTab quirksTab;
@@ -92,6 +94,7 @@ public class PMMainUI extends MegaMekLabMainUI {
 
         structureTab = new PMStructureTab(this);
         previewTab = new PreviewTab(this);
+        analysisTab = new AnalysisTab(this);
         statusbar = new PMStatusBar(this);
         equipmentTab = new PMEquipmentTab(this);
         buildTab = new PMBuildTab(this, this);
@@ -109,6 +112,7 @@ public class PMMainUI extends MegaMekLabMainUI {
         configPane.addTab("Fluff", new TabScrollPane(fluffTab));
         configPane.addTab("Quirks", new TabScrollPane(quirksTab, quirksTab.refreshOnShow));
         configPane.addTab("Preview", previewTab);
+        configPane.addTab("Analysis", analysisTab);
 
         add(configPane, BorderLayout.CENTER);
         add(statusbar, BorderLayout.SOUTH);
@@ -160,6 +164,7 @@ public class PMMainUI extends MegaMekLabMainUI {
         quirksTab.refresh();
         fluffTab.refresh();
         previewTab.refresh();
+        analysisTab.refresh();
         floatingEquipmentDatabase.refresh();
         refreshHeader();
     }
@@ -190,6 +195,7 @@ public class PMMainUI extends MegaMekLabMainUI {
     public void refreshPreview() {
         super.refreshPreview();
         previewTab.refresh();
+        analysisTab.refresh();
     }
 
     @Override
