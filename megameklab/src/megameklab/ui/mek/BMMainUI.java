@@ -53,6 +53,7 @@ import megameklab.ui.MegaMekLabMainUI;
 import megameklab.ui.dialog.FloatingEquipmentDatabaseDialog;
 import megameklab.ui.generalUnit.AbstractEquipmentTab;
 import megameklab.ui.generalUnit.FluffTab;
+import megameklab.ui.generalUnit.AnalysisTab;
 import megameklab.ui.generalUnit.PreviewTab;
 import megameklab.ui.generalUnit.QuirksTab;
 import megameklab.ui.util.TabScrollPane;
@@ -65,6 +66,7 @@ public class BMMainUI extends MegaMekLabMainUI {
     private TabScrollPane frankenMekStructureTab;
     private AbstractEquipmentTab equipmentTab;
     private PreviewTab previewTab;
+    private AnalysisTab analysisTab;
     private BMBuildTab buildTab;
     private FluffTab fluffTab;
     private BMStatusBar statusbar;
@@ -95,6 +97,7 @@ public class BMMainUI extends MegaMekLabMainUI {
         structureTab = new BMStructureTab(this);
         frankenMekStructureTab = new TabScrollPane(structureTab.getFrankenMekStructureView());
         previewTab = new PreviewTab(this);
+        analysisTab = new AnalysisTab(this);
         statusbar = new BMStatusBar(this);
         equipmentTab = new BMEquipmentTab(this);
         buildTab = new BMBuildTab(this);
@@ -113,6 +116,7 @@ public class BMMainUI extends MegaMekLabMainUI {
         configPane.addTab("Fluff", new TabScrollPane(fluffTab));
         configPane.addTab("Quirks", new TabScrollPane(quirksTab, quirksTab.refreshOnShow));
         configPane.addTab("Preview", previewTab);
+        configPane.addTab("Analysis", analysisTab);
 
         add(configPane, BorderLayout.CENTER);
         add(statusbar, BorderLayout.SOUTH);
@@ -231,6 +235,7 @@ public class BMMainUI extends MegaMekLabMainUI {
         buildTab.refresh();
         quirksTab.refresh();
         previewTab.refresh();
+        analysisTab.refresh();
         floatingEquipmentDatabase.refresh();
         fluffTab.refresh();
         refreshHeader();
@@ -263,6 +268,7 @@ public class BMMainUI extends MegaMekLabMainUI {
     public void refreshPreview() {
         super.refreshPreview();
         previewTab.refresh();
+        analysisTab.refresh();
     }
 
     @Override
