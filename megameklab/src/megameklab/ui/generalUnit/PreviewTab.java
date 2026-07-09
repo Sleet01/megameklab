@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 - jtighe (torren@users.sourceforge.net)
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMekLab.
  *
@@ -47,8 +47,10 @@ import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.clientGUI.calculationReport.FlexibleCalculationReport;
 import megamek.client.ui.dialogs.unitSelectorDialogs.AvailabilityPanel;
 import megamek.client.ui.dialogs.unitSelectorDialogs.ConfigurableMekViewPanel;
+import megamek.client.ui.dialogs.unitSelectorDialogs.DamageAnalysisPanel;
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutPanel;
 import megamek.client.ui.panels.alphaStrike.ConfigurableASCardPanel;
+import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.util.ViewFormatting;
 import megamek.common.alphaStrike.conversion.ASConverter;
 import megamek.common.templates.TROView;
@@ -69,6 +71,7 @@ public class PreviewTab extends ITab {
     private final ConfigurableASCardPanel cardPanel = new ConfigurableASCardPanel(null);
     private final RecordSheetPreviewPanel rsPanel = new RecordSheetPreviewPanel();
     private final AvailabilityPanel factionPanel = new AvailabilityPanel();
+    private final DamageAnalysisPanel analysisPanel = new DamageAnalysisPanel();
     private final String tabIndexSettingName = "PreviewTab.panPreview.selectedIndex";
     private final EnhancedTabbedPane panPreview;
     private final Timer refreshTimer = new Timer(REFRESH_DEBOUNCE_DELAY_MS, e -> performUpdate());
@@ -80,6 +83,9 @@ public class PreviewTab extends ITab {
         refreshTimer.setRepeats(false);
         panelMekView.setMinimumSize(new Dimension(400, panelMekView.getMinimumSize().height));
         panelTROView.setMinimumSize(new Dimension(400, panelTROView.getMinimumSize().height));
+        // The analysis panel's own minimum is wider than the editor's preview pane; it degrades
+        // gracefully at small sizes, so relax the minimum to the pane's usual width.
+        analysisPanel.setMinimumSize(UIUtil.scaleForGUI(400, 500));
         rsPanel.setMinZoom(1.0f);
         rsPanel.setFullAsyncMode(false);
 
@@ -100,6 +106,7 @@ public class PreviewTab extends ITab {
         panPreview.addTab("Factions", factionPanel.getPanel());
         panPreview.addTab("AS Card", cardPanel);
         panPreview.addTab("Record Sheet", rsPanel);
+        panPreview.addTab("Analysis", analysisPanel);
         List<String> tabsOrder = GUIPreferences.getInstance().getTabOrder(this.getClass().getName());
         panPreview.setTabOrder(tabsOrder);
         add(panPreview, BorderLayout.CENTER);
@@ -149,6 +156,7 @@ public class PreviewTab extends ITab {
         panelTROView.setPreferredSize(new Dimension(panelWidth, panelTROView.getPreferredSize().height));
         cardPanel.setPreferredSize(new Dimension(panelWidth, cardPanel.getPreferredSize().height));
         rsPanel.setPreferredSize(new Dimension(panelWidth, rsPanel.getPreferredSize().height));
+        analysisPanel.setPreferredSize(new Dimension(panelWidth, analysisPanel.getPreferredSize().height));
 
         // Force a refresh to ensure content uses the new width
         revalidate();
@@ -177,12 +185,14 @@ public class PreviewTab extends ITab {
             }
             rsPanel.setEntity(selectedUnit);
             factionPanel.setUnit(selectedUnit.getModel(), selectedUnit.getFullChassis());
+            analysisPanel.setEntity(selectedUnit);
         } else {
             panelMekView.reset();
             panelTROView.reset();
             cardPanel.setASElement(null);
             rsPanel.setEntity(null);
             factionPanel.reset();
+            analysisPanel.setEntity(null);
         }
     }
 
