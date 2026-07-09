@@ -50,6 +50,7 @@ import megamek.common.weapons.infantry.InfantryWeapon;
 import megameklab.ui.MegaMekLabMainUI;
 import megameklab.ui.PopupMessages;
 import megameklab.ui.generalUnit.FluffTab;
+import megameklab.ui.generalUnit.AnalysisTab;
 import megameklab.ui.generalUnit.PreviewTab;
 import megameklab.ui.util.TabScrollPane;
 
@@ -57,6 +58,7 @@ public class CIMainUI extends MegaMekLabMainUI {
 
     CIStructureTab structureTab;
     PreviewTab previewTab;
+    AnalysisTab analysisTab;
     FluffTab fluffTab;
     CIStatusBar statusbar;
 
@@ -85,6 +87,7 @@ public class CIMainUI extends MegaMekLabMainUI {
         structureTab = new CIStructureTab(this);
         fluffTab = new FluffTab(this);
         previewTab = new PreviewTab(this);
+        analysisTab = new AnalysisTab(this);
 
         structureTab.addRefreshedListener(this);
         fluffTab.setRefreshedListener(this);
@@ -93,6 +96,7 @@ public class CIMainUI extends MegaMekLabMainUI {
         configPane.addTab("Build", structureTab);
         configPane.addTab("Fluff", new TabScrollPane(fluffTab));
         configPane.addTab("Preview", previewTab);
+        configPane.addTab("Analysis", analysisTab);
 
         add(configPane, BorderLayout.CENTER);
         add(statusbar, BorderLayout.SOUTH);
@@ -129,6 +133,7 @@ public class CIMainUI extends MegaMekLabMainUI {
         structureTab.refresh();
         fluffTab.refresh();
         previewTab.refresh();
+        analysisTab.refresh();
         refreshHeader();
     }
 
@@ -173,6 +178,7 @@ public class CIMainUI extends MegaMekLabMainUI {
     public void refreshPreview() {
         super.refreshPreview();
         previewTab.refresh();
+        analysisTab.refresh();
     }
 
     @Override
